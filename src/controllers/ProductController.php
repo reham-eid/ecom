@@ -1,26 +1,57 @@
 <?php
 
-require_once __DIR__ . '/../models/ProductModel.php';
+namespace Src\Controller;
 
-class ProductController {
-    private $productModel;
+use GuzzleHttp\Psr7\Response;
+use Src\Repository\ProductRepository;
 
-    public function __construct($pdo) {
-        $this->productModel = new ProductModel($pdo);
+class ProductController{
+
+    private $productRepository;
+
+    public function __construct( ProductRepository $productRepository)
+    {
+        $this->productRepository = $productRepository;
     }
 
-    public function getAllProducts() {
-        $products = $this->productModel->getAllProducts();
-        echo json_encode($products); // ext-json
-    } 
-
-    public function getProductDetails($id) {
-        $product = $this->productModel->getProductById($id);
-        if ($product) {
-            echo json_encode($product);
-        } else {
-            http_response_code(404);
-            echo json_encode(['message' => 'Product not found']);
+    public function processRequest($method , $id = null){
+        switch($method){
+            case 'GET':
+                if ($id) {
+                    $this->getProduct($id);
+                }else{
+                    $this->getAllProducts();
+                }
+                break;
+            default: $response = new Response(
+                405 , 
+                ['Content-Type' => 'application/json'],
+                json_encode(['message' => 'Method not allowed'])
+            );
+            echo $response->getBody();
         }
     }
+
+    private function getAllProducts(){
+        $products = $this->productRepository->findAll();
+        $response = new Response(
+            200 , 
+            ['Content-Type' => 'application/json'],
+            json_encode($products)
+        );
+        $response->getBody();
+    }
+
+    private function getProduct($id)
+    {
+        $product = $this->productRepository->find($id);
+        if ($product) {
+            $response = new Response(200, ['Content-Type' => 'application/json'], json_encode($product));
+        } else {
+            $response = new Response(404, ['Content-Type' => 'application/json'], json_encode(['message' => 'Product not found']));
+        }
+        echo $response->getBody();
+    }
 }
+?>
+
