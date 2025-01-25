@@ -28,6 +28,7 @@ class ComposerStaticInite875ae8441d070d7dda5f4b47a2117aa
         'G' => 
         array (
             'GuzzleHttp\\Psr7\\' => 16,
+            'GraphQL\\' => 8,
             'GrahamCampbell\\ResultType\\' => 26,
         ),
         'D' => 
@@ -65,6 +66,10 @@ class ComposerStaticInite875ae8441d070d7dda5f4b47a2117aa
         'GuzzleHttp\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
+        ),
+        'GraphQL\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webonyx/graphql-php/src',
         ),
         'GrahamCampbell\\ResultType\\' => 
         array (
