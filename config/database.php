@@ -1,7 +1,7 @@
 <?php
 
 namespace Config;
-require_once __DIR__ . '/../vendor/autoload.php'; // /../vendor/autoload.php
+require_once __DIR__ . '/../vendor/autoload.php'; 
 
 use Dotenv\Dotenv;
 
@@ -18,17 +18,17 @@ class Database
 
     private function __construct()
     {
-        $host = $_ENV['DB_HOST'];
-        $dbname = $_ENV['DB_NAME'];
-        $user = $_ENV['DB_USER'];
-        $pass = $_ENV['DB_PASS'];
+        $host = $_ENV['DB_HOST'] ?? 'localhost';;
+        $dbname = $_ENV['DB_NAME']?? 'ecommerce_PHP';
+        $user = $_ENV['DB_USER'] ?? 'root'; 
+        $pass = $_ENV['DB_PASS'] ?? '';
 
         echo $host . "<br>";
         echo $dbname . "<br>";
         echo $user . "<br>";
         echo $pass . "<br>";
         try {
-            $this->connection = new PDO("mysql:host=localhost;dbname=ecommerce", "root", "");
+            $this->connection = new PDO("mysql:host=$host;port=3308;dbname=$dbname", $user, $pass);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die("Database connection failed: " . $e->getMessage());
