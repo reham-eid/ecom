@@ -3,13 +3,13 @@
 /// index.php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use Config\Database;
+use config\Database;
 use GraphQL\GraphQL;
-use Src\Controller\ProductController;
-use Src\Controller\CartController;
-use Src\Repository\ProductRepository;
-use Src\Repository\CartRepository;
-use Src\Routing\Router;
+use src\controllers\ProductController;
+use src\controllers\CartController;
+use src\repository\ProductRepository;
+use src\repository\CartRepository;
+use src\routes\Router;
 
 // Handle GraphQL requests
 if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'POST') {

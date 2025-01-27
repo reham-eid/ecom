@@ -3,14 +3,14 @@
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
-use GraphQL\Types\ProductType;
-use GraphQL\Types\CategoryType;
-use GraphQL\Types\AttributeType;
-use GraphQL\Types\OrderType;
-use GraphQL\Resolvers\ProductResolver;
-use GraphQL\Resolvers\CategoryResolver;
-use GraphQL\Resolvers\AttributeResolver;
-use GraphQL\Resolvers\OrderResolver;
+use graphql\types\ProductType;
+use graphql\types\CategoryType;
+use graphql\types\AttributeType;
+use graphql\types\OrderType;
+use graphql\resolvers\ProductResolver;
+use graphql\resolvers\CategoryResolver;
+use graphql\resolvers\AttributeResolver;
+use graphql\resolvers\OrderResolver;
 
 $queryType = new ObjectType([
     'name' => 'Query',

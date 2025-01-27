@@ -1,9 +1,8 @@
 <?php
 
-namespace Src\Repository;
+namespace src\repository;
 
 use PDO;
-use Src\Model\Cart;
 
 class CartRepository{
   private $pdo;

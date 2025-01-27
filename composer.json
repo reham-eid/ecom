@@ -6,8 +6,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Src\\": "src/" ,
-            "Config\\": "config/"
+            "src\\": "src/" ,
+            "config\\": "config/"
         }
     }
 }

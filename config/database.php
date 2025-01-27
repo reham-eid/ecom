@@ -1,6 +1,6 @@
 <?php
 
-namespace Config;
+namespace config;
 require_once __DIR__ . '/../vendor/autoload.php'; 
 
 use Dotenv\Dotenv;
@@ -23,10 +23,6 @@ class Database
         $user = $_ENV['DB_USER'] ?? 'root'; 
         $pass = $_ENV['DB_PASS'] ?? '';
 
-        echo $host . "<br>";
-        echo $dbname . "<br>";
-        echo $user . "<br>";
-        echo $pass . "<br>";
         try {
             $this->connection = new PDO("mysql:host=$host;port=3308;dbname=$dbname", $user, $pass);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

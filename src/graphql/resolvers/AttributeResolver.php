@@ -1,6 +1,6 @@
 <?php
 
-namespace GraphQL\Resolvers;
+namespace graphql\resolvers;
 
 class AttributeResolver
 {

@@ -14,12 +14,19 @@ class ComposerStaticInite875ae8441d070d7dda5f4b47a2117aa
     );
 
     public static $prefixLengthsPsr4 = array (
+        's' => 
+        array (
+            'src\\' => 4,
+        ),
+        'c' => 
+        array (
+            'config\\' => 7,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
-            'Src\\' => 4,
         ),
         'P' => 
         array (
@@ -36,13 +43,17 @@ class ComposerStaticInite875ae8441d070d7dda5f4b47a2117aa
         array (
             'Dotenv\\' => 7,
         ),
-        'C' => 
-        array (
-            'Config\\' => 7,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'src\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
+        ),
+        'config\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/config',
+        ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
@@ -54,10 +65,6 @@ class ComposerStaticInite875ae8441d070d7dda5f4b47a2117aa
         'Symfony\\Polyfill\\Ctype\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
-        ),
-        'Src\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/Src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -83,10 +90,6 @@ class ComposerStaticInite875ae8441d070d7dda5f4b47a2117aa
         'Dotenv\\' => 
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
-        ),
-        'Config\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/config',
         ),
     );
 

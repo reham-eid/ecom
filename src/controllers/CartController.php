@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Controller;
+namespace src\controllers;
 
 use GuzzleHttp\Psr7\Response;
-use Src\Repository\CartRepository;
+use src\repository\CartRepository;
 
 class CartController
 {

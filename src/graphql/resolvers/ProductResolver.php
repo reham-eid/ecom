@@ -1,8 +1,8 @@
 <?php
 
-namespace GraphQL\Resolvers;
+namespace graphql\resolvers;
 
-use Config\Database;
+use config\Database;
 use PDO;
 
 class ProductResolver

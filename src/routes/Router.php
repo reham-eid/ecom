@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Routing;
+namespace src\routes;
 
 use GuzzleHttp\Psr7\Response;
 
@@ -40,6 +40,7 @@ class Router
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
+        header("Access-Control-Allow-Headers: Content-Type");
         header('Content-Type: application/json; charset=UTF-8');
 
         // Prepare path
@@ -48,8 +49,19 @@ class Router
         $path = $uriParts[0] ?? null; // Get the path (e.g., "products")
         $id = $uriParts[1] ?? null; // Get the ID (e.g., "123")
 
+    // Debugging: Log the path and ID
+    error_log("Path: " . $path);
+    error_log("ID: " . $id);
         // Route the request
         switch ($path) {
+            case '': // Root URL
+                $response = new Response(
+                    200,
+                    ['Content-Type' => 'application/json'],
+                    json_encode(['message' => 'Welcome to the E-Commerce API!'])
+                );
+                echo $response->getBody();
+                break;
             case 'products':
                 $this->controllers['ProductController']->processRequest($this->method , $id );
                 break;

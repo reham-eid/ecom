@@ -1,5 +1,5 @@
 <?php
-namespace Src\Repository;
+namespace src\repository;
 
 use PDO;
 
@@ -11,14 +11,18 @@ class ProductRepository{
   }
 
   public function findAll(): array{
-    $stmt = $this->pdo->query("SELECT * FROM products");
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $this->pdo->query("SELECT * FROM `products` ");
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    error_log("Fetched products: " . json_encode($products));
+    return $products;
   }
 
   public function find($id): object {
-    $stmt = $this->pdo->prepare("SELECT * FROM products WHERE id = :id");
+    $stmt = $this->pdo->prepare("SELECT * FROM `products` WHERE id = :id");
     $stmt->execute(['id' => $id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+    error_log("Fetched products: " . json_encode($product));
+    return $product;
 }
 }
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Controller;
+namespace src\controllers;
 
 use GuzzleHttp\Psr7\Response;
-use Src\Repository\ProductRepository;
+use src\repository\ProductRepository;
 
 class ProductController{
 
@@ -15,6 +15,8 @@ class ProductController{
     }
 
     public function processRequest($method , $id = null){
+        error_log("Processing request: method=$method, id=$id");
+
         switch($method){
             case 'GET':
                 if ($id) {
@@ -23,23 +25,34 @@ class ProductController{
                     $this->getAllProducts();
                 }
                 break;
-            default: $response = new Response(
+            default: 
+                $response = new Response(
                 405 , 
                 ['Content-Type' => 'application/json'],
                 json_encode(['message' => 'Method not allowed'])
             );
             echo $response->getBody();
+            break;
         }
     }
 
     private function getAllProducts(){
         $products = $this->productRepository->findAll();
-        $response = new Response(
-            200 , 
-            ['Content-Type' => 'application/json'],
-            json_encode($products)
-        );
-        $response->getBody();
+        if ($products) {
+            $response = new Response(
+                200 , 
+                ['Content-Type' => 'application/json'],
+                json_encode($products)
+            );
+            echo $response->getBody();
+        }else{
+            $response = new Response(
+                404 , 
+                ['Content-Type' => 'application/json'],
+                json_encode(['message' => 'No products found'])
+            );
+            echo $response->getBody();
+        }
     }
 
     private function getProduct($id)
