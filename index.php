@@ -12,9 +12,11 @@ use src\repository\CartRepository;
 use src\routes\Router;
 
 // Handle GraphQL requests
-if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // Load the schema
-    $schemaPath = __DIR__ . '/graphql/schema.php';
+//     echo __DIR__;
+// die();
+    $schemaPath = __DIR__ . '/src/graphql/schema.php';
     if (!file_exists($schemaPath)) {
         die("Schema file not found at: $schemaPath");
     }
