@@ -7,7 +7,9 @@ use GraphQL\Type\Definition\Type;
 
 class CurrencyType extends ObjectType
 {
-    public function __construct()
+    private static $instance;
+    
+    private function __construct()
     {
         $config = [
             'name' => 'Currency',
@@ -17,5 +19,13 @@ class CurrencyType extends ObjectType
             ],
         ];
         parent::__construct($config);
+    }
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 }

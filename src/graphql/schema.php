@@ -1,5 +1,5 @@
 <?php
-// graphql/schema.php
+
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
@@ -12,17 +12,18 @@ use graphql\resolvers\CategoryResolver;
 use graphql\resolvers\AttributeResolver;
 use graphql\resolvers\OrderResolver;
 
+// Query Type
 $queryType = new ObjectType([
     'name' => 'Query',
     'fields' => [
         'products' => [
-            'type' => Type::listOf(new ProductType()),
+            'type' => Type::listOf(ProductType::getInstance()), // Use Singleton
             'resolve' => function () {
                 return ProductResolver::fetchProducts();
-            }
+            },
         ],
         'product' => [
-            'type' => new ProductType(),
+            'type' => ProductType::getInstance(), // Use Singleton
             'args' => [
                 'id' => ['type' => Type::id()],
             ],
@@ -31,13 +32,13 @@ $queryType = new ObjectType([
             },
         ],
         'categories' => [
-            'type' => Type::listOf(new CategoryType()),
+            'type' => Type::listOf(CategoryType::getInstance()), // Use Singleton
             'resolve' => function () {
                 return CategoryResolver::fetchCategories();
             },
         ],
         'category' => [
-            'type' => new CategoryType(),
+            'type' => CategoryType::getInstance(), // Use Singleton
             'args' => [
                 'id' => ['type' => Type::id()],
             ],
@@ -46,13 +47,13 @@ $queryType = new ObjectType([
             },
         ],
         'attributes' => [
-            'type' => Type::listOf(new AttributeType()),
+            'type' => Type::listOf(AttributeType::getInstance()), // Use Singleton
             'resolve' => function () {
                 return AttributeResolver::fetchAttributes();
             },
         ],
         'attribute' => [
-            'type' => new AttributeType(),
+            'type' => AttributeType::getInstance(), // Use Singleton
             'args' => [
                 'id' => ['type' => Type::id()],
             ],
@@ -60,15 +61,15 @@ $queryType = new ObjectType([
                 return AttributeResolver::fetchAttributeById($args['id']);
             },
         ],
-    ]
+    ],
 ]);
 
-// Define the Mutation type
+// Mutation Type
 $mutationType = new ObjectType([
     'name' => 'Mutation',
     'fields' => [
         'createOrder' => [
-            'type' => new OrderType(),
+            'type' => OrderType::getInstance(), // Use Singleton
             'args' => [
                 'productId' => ['type' => Type::id()],
                 'quantity' => ['type' => Type::int()],
@@ -80,9 +81,10 @@ $mutationType = new ObjectType([
     ],
 ]);
 
-// Create the schema
+// Create the Schema
 return new Schema([
     'query' => $queryType,
     'mutation' => $mutationType,
 ]);
+
 ?>

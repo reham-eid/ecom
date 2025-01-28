@@ -1,8 +1,9 @@
 <?php
 
-/// index.php
+// Load dependencies
 require_once __DIR__ . '/vendor/autoload.php';
 
+use GraphQL\Error\DebugFlag;
 use config\Database;
 use GraphQL\GraphQL;
 use src\controllers\ProductController;
@@ -10,33 +11,55 @@ use src\controllers\CartController;
 use src\repository\ProductRepository;
 use src\repository\CartRepository;
 use src\routes\Router;
+use Dotenv\Dotenv;
 
-// Handle GraphQL requests
+// Load environment variables
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+// Set default environment
+$appEnv = $_ENV['APP_ENV'] ?? 'production';
+
+// Enable error reporting in development mode
+if ($appEnv === 'development') {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
+
+// GraphQL endpoint
 if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Load the schema
-//     echo __DIR__;
-// die();
     $schemaPath = __DIR__ . '/src/graphql/schema.php';
+
     if (!file_exists($schemaPath)) {
-        die("Schema file not found at: $schemaPath");
+        die(json_encode(['errors' => ['message' => "Schema file not found at: $schemaPath"]]));
     }
 
     $schema = require $schemaPath;
 
-    // Handle the GraphQL request
     $rawInput = file_get_contents('php://input');
     $input = json_decode($rawInput, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        die(json_encode(['errors' => ['message' => 'Invalid JSON input.']]));
+    }
+
     $query = $input['query'];
-    $variableValues = isset($input['variables']) ? $input['variables'] : null;
+    $variableValues = $input['variables'] ?? null;
 
     try {
+        $debugFlags = ($appEnv === 'development')
+            ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS
+            : 0;
+
         $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
-        $output = $result->toArray();
+        $output = $result->toArray($debugFlags);
+
     } catch (\Exception $e) {
         $output = [
             'errors' => [
-                'message' => $e->getMessage(),
-            ]
+                ['message' => $e->getMessage()],
+            ],
         ];
     }
 
@@ -45,12 +68,10 @@ if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'GE
     exit;
 }
 
-// Handle REST API requests
+// REST API endpoint
 $pdo = Database::getInstance();
-
-// Debugging: Check the type of $pdo
 if (!($pdo instanceof PDO)) {
-    die("Invalid PDO object. Check your database configuration.");
+    die(json_encode(['errors' => ['message' => "Database connection failed."]]));
 }
 
 $productRepository = new ProductRepository($pdo);

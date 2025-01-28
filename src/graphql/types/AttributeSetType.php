@@ -7,7 +7,9 @@ use GraphQL\Type\Definition\Type;
 
 class AttributeSetType extends ObjectType
 {
-  public function __construct()
+  private static $instance;
+
+  private function __construct()
   {
     $config = [
       'name' => 'AttributeSet',
@@ -16,11 +18,19 @@ class AttributeSetType extends ObjectType
           'name' => ['type' => Type::string()],
           'type' => ['type' => Type::string()],
           'items' => ['type' => Type::listOf(function() {
-              return new AttributeType();
+              return AttributeType::getInstance();
           })],
       ],
     ];
     parent::__construct($config);
+  }
+
+  public static function getInstance()
+  {
+      if (self::$instance === null) {
+          self::$instance = new self();
+      }
+      return self::$instance;
   }
 
 }

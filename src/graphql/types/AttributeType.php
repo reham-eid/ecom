@@ -7,7 +7,11 @@ use GraphQL\Type\Definition\Type;
 
 class AttributeType extends ObjectType
 {
-    public function __construct()
+    // Static property to hold the single instance
+    private static $instance;
+
+    // Private constructor to prevent direct instantiation
+    private function __construct()
     {
         $config = [
             'name' => 'Attribute',
@@ -18,5 +22,14 @@ class AttributeType extends ObjectType
             ],
         ];
         parent::__construct($config);
+    }
+
+    // Public method to access the single instance
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 }

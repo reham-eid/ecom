@@ -18,6 +18,10 @@ class ComposerStaticInite875ae8441d070d7dda5f4b47a2117aa
         array (
             'src\\' => 4,
         ),
+        'g' => 
+        array (
+            'graphql\\' => 8,
+        ),
         'c' => 
         array (
             'config\\' => 7,
@@ -49,6 +53,10 @@ class ComposerStaticInite875ae8441d070d7dda5f4b47a2117aa
         'src\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
+        ),
+        'graphql\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/graphql',
         ),
         'config\\' => 
         array (

@@ -7,7 +7,10 @@ use GraphQL\Type\Definition\Type;
 
 class CategoryType extends ObjectType
 {
-    public function __construct()
+    // Static property to hold the single instance
+    private static $instance;
+
+    private function __construct()
     {
         $config = [
             'name' => 'Category',
@@ -16,5 +19,14 @@ class CategoryType extends ObjectType
             ],
         ];
         parent::__construct($config);
+    }
+
+    // Public method to access the single instance
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 }

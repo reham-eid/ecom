@@ -7,7 +7,10 @@ use GraphQL\Type\Definition\Type;
 
 class ProductType extends ObjectType
 {
-  public function __construct()
+  // Static property to hold the single instance
+  private static $instance;
+
+  private function __construct()
   {
     $config = [
       'name' => 'Product',
@@ -15,20 +18,39 @@ class ProductType extends ObjectType
         'id' => ['type' => Type::id()],
         'name' => ['type' => Type::string()],
         'inStock' => ['type' => Type::boolean()],
-        'gallery' => ['type' => Type::listOf(Type::string())],
+        'gallery' => [
+            'type' => Type::listOf(Type::string()),
+            'resolve' => function ($root, $args) {
+                return isset($root['gallery']) ? json_decode($root['gallery'], true) : [];
+            },
+        ],        
         'description' => ['type' => Type::string()],
         'category' => ['type' => Type::string()],
         'attributes' => ['type' => Type::listOf(function(){
-          return new AttributeSetType();
+          return AttributeSetType::getInstance();
         })],
-        'prices' => ['type' => Type::listOf(function(){
-            return new PriceType();
-        })],
+        'prices' => [
+          'type' => Type::listOf(PriceType::getInstance() ),
+          'resolve' => function ($root, $args) {
+            error_log(print_r($root['prices'], true));
+            return $root['prices'] ?? [];
+        },
+      ],
         'brand' =>['type' => Type::string()],
+        'typename' =>['type' => Type::string()],
       ]
     ];
 
     parent::__construct($config);
+  }
+
+  // Public method to access the single instance
+  public static function getInstance()
+  {
+      if (self::$instance === null) {
+          self::$instance = new self();
+      }
+      return self::$instance;
   }
 }
 ?>
