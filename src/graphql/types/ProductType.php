@@ -19,10 +19,10 @@ class ProductType extends ObjectType
         'name' => ['type' => Type::string()],
         'inStock' => ['type' => Type::boolean()],
         'gallery' => [
-            'type' => Type::listOf(Type::string()),
-            'resolve' => function ($root, $args) {
-                return isset($root['gallery']) ? json_decode($root['gallery'], true) : [];
-            },
+            'type' => Type::listOf(Type::string())
+            // 'resolve' => function ($root, $args) {
+            //     return isset($root['gallery']) ? json_decode($root['gallery'], true) : [];
+            // },
         ],        
         'description' => ['type' => Type::string()],
         'category' => ['type' => Type::string()],
@@ -32,12 +32,12 @@ class ProductType extends ObjectType
         'prices' => [
           'type' => Type::listOf(PriceType::getInstance() ),
           'resolve' => function ($root, $args) {
-            error_log(print_r($root['prices'], true));
+            // error_log(print_r($root['prices'], true));
             return $root['prices'] ?? [];
         },
       ],
         'brand' =>['type' => Type::string()],
-        'typename' =>['type' => Type::string()],
+        '__typename' =>['type' => Type::string()],
       ]
     ];
 

@@ -22,15 +22,15 @@ $queryType = new ObjectType([
                 return ProductResolver::fetchProducts();
             },
         ],
-        'product' => [
-            'type' => ProductType::getInstance(), // Use Singleton
-            'args' => [
-                'id' => ['type' => Type::id()],
-            ],
-            'resolve' => function ($root, $args) {
-                return ProductResolver::fetchProductById($args['id']);
-            },
-        ],
+        // 'product' => [
+        //     'type' => ProductType::getInstance(), // Use Singleton
+        //     'args' => [
+        //         'id' => ['type' => Type::id()],
+        //     ],
+        //     'resolve' => function ($root, $args) {
+        //         return ProductResolver::fetchProductById($args['id']);
+        //     },
+        // ],
         'categories' => [
             'type' => Type::listOf(CategoryType::getInstance()), // Use Singleton
             'resolve' => function () {

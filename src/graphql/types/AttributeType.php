@@ -17,8 +17,9 @@ class AttributeType extends ObjectType
             'name' => 'Attribute',
             'fields' => [
                 'id' => ['type' => Type::id()],
-                'name' => ['type' => Type::string()],
+                'displayValue' => ['type' => Type::string()],
                 'value' => ['type' => Type::string()],
+                '__typename' => ['type' => Type::string()],
             ],
         ];
         parent::__construct($config);

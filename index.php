@@ -27,71 +27,86 @@ if ($appEnv === 'development') {
     error_reporting(E_ALL);
 }
 
-// GraphQL endpoint
-if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    $schemaPath = __DIR__ . '/src/graphql/schema.php';
+try {
+    // GraphQL endpoint
+    if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $schemaPath = __DIR__ . '/src/graphql/schema.php';
 
-    if (!file_exists($schemaPath)) {
-        die(json_encode(['errors' => ['message' => "Schema file not found at: $schemaPath"]]));
+        if (!file_exists($schemaPath)) {
+            http_response_code(500);
+            echo json_encode(['errors' => [['message' => "Schema file not found at: $schemaPath"]]]);
+            exit;
+        }
+
+        $schema = require $schemaPath;
+        $rawInput = file_get_contents('php://input');
+        $input = json_decode($rawInput, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['errors' => [['message' => 'Invalid JSON input.']]]);
+            exit;
+        }
+
+        $query = $input['query'] ?? null;
+        $variableValues = $input['variables'] ?? null;
+
+        if (!$query) {
+            http_response_code(400);
+            echo json_encode(['errors' => [['message' => 'Query parameter is required.']]]);
+            exit;
+        }
+
+        try {
+            $debugFlags = ($appEnv === 'development')
+                ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS
+                : 0;
+
+            $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
+            $output = $result->toArray($debugFlags);
+        } catch (Exception $e) {
+            http_response_code(500);
+            $output = ['errors' => [['message' => $e->getMessage()]]];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($output);
+        exit;
     }
 
-    $schema = require $schemaPath;
-
-    $rawInput = file_get_contents('php://input');
-    $input = json_decode($rawInput, true);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        die(json_encode(['errors' => ['message' => 'Invalid JSON input.']]));
+    // REST API endpoint
+    $pdo = Database::getInstance();
+    if (!($pdo instanceof PDO)) {
+        http_response_code(500);
+        echo json_encode(['errors' => [['message' => "Database connection failed."]]]);
+        exit;
     }
 
-    $query = $input['query'];
-    $variableValues = $input['variables'] ?? null;
+    $productRepository = new ProductRepository($pdo);
+    $cartRepository = new CartRepository($pdo);
 
-    try {
-        $debugFlags = ($appEnv === 'development')
-            ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS
-            : 0;
+    $productController = new ProductController($productRepository);
+    $cartController = new CartController($cartRepository);
 
-        $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
-        $output = $result->toArray($debugFlags);
+    $requestUri = $_SERVER['REQUEST_URI'];
+    $requestMethod = $_SERVER['REQUEST_METHOD'];
 
-    } catch (\Exception $e) {
-        $output = [
-            'errors' => [
-                ['message' => $e->getMessage()],
-            ],
-        ];
-    }
+    $router = new Router(
+        $requestMethod,
+        $requestUri,
+        [
+            "ProductController" => $productController,
+            "CartController" => $cartController
+        ]
+    );
 
-    header('Content-Type: application/json');
-    echo json_encode($output);
+    $router->run();
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        'errors' => [
+            ['message' => 'Internal Server Error: ' . $e->getMessage()]
+            ]
+        ]);
     exit;
 }
-
-// REST API endpoint
-$pdo = Database::getInstance();
-if (!($pdo instanceof PDO)) {
-    die(json_encode(['errors' => ['message' => "Database connection failed."]]));
-}
-
-$productRepository = new ProductRepository($pdo);
-$cartRepository = new CartRepository($pdo);
-
-$productController = new ProductController($productRepository);
-$cartController = new CartController($cartRepository);
-
-$requestUri = $_SERVER['REQUEST_URI'];
-$requestMethod = $_SERVER['REQUEST_METHOD'];
-
-$router = new Router(
-    $requestMethod,
-    $requestUri,
-    [
-        "ProductController" => $productController,
-        "CartController" => $cartController
-    ]
-);
-
-$router->run();
-
-?>

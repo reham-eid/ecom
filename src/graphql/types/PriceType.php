@@ -16,6 +16,7 @@ class PriceType extends ObjectType
             'fields' => [
                 'amount' => ['type' => Type::float()],
                 'currency' => ['type' => CurrencyType::getInstance()],
+                '__typename' =>['type' => Type::string()],
             ],
         ];
         

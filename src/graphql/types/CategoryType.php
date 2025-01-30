@@ -16,6 +16,7 @@ class CategoryType extends ObjectType
             'name' => 'Category',
             'fields' => [
                 'name' => ['type' => Type::string()],
+                '__typename' =>['type' => Type::string()],
             ],
         ];
         parent::__construct($config);

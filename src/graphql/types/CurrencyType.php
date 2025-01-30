@@ -16,6 +16,7 @@ class CurrencyType extends ObjectType
             'fields' => [
                 'label' => ['type' => Type::string()],
                 'symbol' => ['type' => Type::string()],
+                '__typename' =>['type' => Type::string()],
             ],
         ];
         parent::__construct($config);

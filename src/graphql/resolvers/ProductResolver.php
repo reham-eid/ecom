@@ -4,60 +4,133 @@ namespace graphql\resolvers;
 
 use config\Database;
 use PDO;
+use Exception;
 
 class ProductResolver
 {
     public static function fetchProducts()
     {
-        $db = Database::getInstance();
-        // $query = "SELECT * FROM products"; 
-        $query = "
-    SELECT 
-        p.*, 
-        g.image_url AS gallery_image, 
-        pr.amount AS price_amount
-    FROM 
-        products p
-    LEFT JOIN gallery g ON p.id = g.product_id
-    LEFT JOIN prices pr ON p.id = pr.product_id
-";
-        $stmt = $db->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    //     $query = "
-    //     SELECT 
-    // p.id AS product_id,
-    // p.name AS product_name,
-    // p.description AS product_description,
-    // p.inStock AS in_stock,
-    // p.category AS category,
-    // p.brand AS brand,
-    // pr.amount AS price_amount,
-    // pr.currency_label AS price_currency_label,
-    // pr.currency_symbol AS price_currency_symbol,
-    // g.image_url AS gallery_image,
-    // a.attribute_name AS attribute_name,
-    // a.attribute_type AS attribute_type,
-    // ai.display_value AS attribute_display_value,
-    // ai.value AS attribute_value
-    // FROM products p
-    // LEFT JOIN prices pr ON p.id = pr.product_id
-    // LEFT JOIN gallery g ON p.id = g.product_id
-    // LEFT JOIN attributes a ON p.id = a.product_id
-    // LEFT JOIN items ai ON a.id = ai.attribute_id
-    // ORDER BY p.id, a.id, ai.id;
+        try {
+            $db = Database::getInstance();
+            $query = "
+                SELECT DISTINCT 
+                    p.id,
+                    p.name,
+                    p.inStock,
+                    p.description,
+                    p.category,
+                    p.brand,
+                    p.__typename AS product__typename,
+                    pg.image_url,
+                    pa.id AS attribute_id,
+                    pa.name,
+                    pa.type,
+                    pa.__typename AS attribute__typename,
+                    ai.displayValue AS item_displayValue,
+                    ai.value AS item_value,
+                    ai.__typename AS item__typename,
+                    pp.amount,
+                    pp.currency,
+                    pp.__typename AS price__typename,
+                    pc.label AS currency_label,
+                    pc.symbol AS currency_symbol,
+                    pc.__typename AS currency__typename
+                FROM
+                    products p
+                LEFT JOIN
+                    gallery pg ON p.id = pg.product_id
+                LEFT JOIN
+                    attributes pa ON p.id = pa.product_id
+                LEFT JOIN
+                    items ai ON pa.id = ai.attribute_id
+                LEFT JOIN
+                    prices pp ON p.id = pp.product_id
+                LEFT JOIN
+                    currency pc ON pp.currency = pc.label;
+            ";
 
-    // ";
+            $stmt = $db->prepare($query);
+            if (!$stmt->execute()) {
+                throw new Exception("Database query failed.");
+            }
 
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (!$rows) {
+                http_response_code(404);
+                return ["error" => "No products found!"];
+            }
 
-    public static function fetchProductById($id)
-    {
-        $db = Database::getInstance();
-        $query = "SELECT * FROM products WHERE id = :id"; 
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+            $products = [];
+            foreach ($rows as $row) {
+                $productId = $row['id'];
+
+                // Initialize the product if it doesn't exist
+                if (!isset($products[$productId])) {
+                    $products[$productId] = [
+                        'id' => $row['id'],
+                        'name' => $row['name'],
+                        'inStock' => $row['inStock'],
+                        'description' => $row['description'],
+                        'category' => $row['category'],
+                        'brand' => $row['brand'],
+                        '__typename' => $row['product__typename'],
+                        'gallery' => [],
+                        'attributes' => [],
+                        'prices' => []
+                    ];
+                }
+
+                // Add gallery image as a simple array of URLs (if not already added)
+                if ($row['image_url'] && !in_array($row['image_url'], $products[$productId]['gallery'])) {
+                    $products[$productId]['gallery'][] = $row['image_url'];
+                }
+
+                // Add attribute if it exists
+                if ($row['attribute_id']) {
+                    $attributeIndex = array_search($row['attribute_id'], array_column($products[$productId]['attributes'], 'id'));
+
+                    if ($attributeIndex === false) {
+                        $products[$productId]['attributes'][] = [
+                            'id' => $row['attribute_id'],
+                            'name' => $row['name'],
+                            'type' => $row['type'],
+                            'items' => [],
+                            '__typename' => $row['attribute__typename'],
+                        ];
+                        $attributeIndex = array_key_last($products[$productId]['attributes']);
+                    }
+
+                    $existingItems = array_column($products[$productId]['attributes'][$attributeIndex]['items'], 'value');
+
+                    if (!in_array($row['item_value'], $existingItems)) {
+                        $products[$productId]['attributes'][$attributeIndex]['items'][] = [
+                            'id' => $row['attribute_id'],
+                            'displayValue' => $row['item_displayValue'],
+                            'value' => $row['item_value'],
+                            '__typename' => $row['item__typename']
+                        ];
+                    }
+                }
+
+                // Add price if it exists and is not already added
+                if ($row['amount'] !== null && !in_array($row['amount'], array_column($products[$productId]['prices'], 'amount'))) {
+                    $products[$productId]['prices'][] = [
+                        'amount' => $row['amount'],
+                        'currency' => [
+                            'label' => $row['currency_label'], 
+                            'symbol' => $row['currency_symbol'], 
+                            '__typename' => $row['currency__typename'], 
+                        ],
+                    ];
+                }
+            }
+
+            http_response_code(200); // Success
+            return array_values($products);
+
+        } catch (\Exception $e) {
+            http_response_code(500); // Internal Server Error
+            return ["error" => $e->getMessage()];
+        }
     }
 }

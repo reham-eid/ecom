@@ -20,6 +20,7 @@ class AttributeSetType extends ObjectType
           'items' => ['type' => Type::listOf(function() {
               return AttributeType::getInstance();
           })],
+          '__typename' => ['type' => Type::string()],
       ],
     ];
     parent::__construct($config);
