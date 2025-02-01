@@ -29,7 +29,7 @@ if ($appEnv === 'development') {
 
 try {
     // GraphQL endpoint
-    if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    if ($_SERVER['REQUEST_URI'] === '/graphql' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $schemaPath = __DIR__ . '/src/graphql/schema.php';
 
         if (!file_exists($schemaPath)) {

@@ -6,31 +6,29 @@ use GraphQL\Type\Schema;
 use graphql\types\ProductType;
 use graphql\types\CategoryType;
 use graphql\types\AttributeType;
-use graphql\types\OrderType;
+// use graphql\types\OrderType;
 use graphql\resolvers\ProductResolver;
 use graphql\resolvers\CategoryResolver;
 use graphql\resolvers\AttributeResolver;
-use graphql\resolvers\OrderResolver;
+// use graphql\resolvers\OrderResolver;
 
+use graphql\schemas\OrderSchema;
 // Query Type
 $queryType = new ObjectType([
     'name' => 'Query',
     'fields' => [
         'products' => [
             'type' => Type::listOf(ProductType::getInstance()), // Use Singleton
-            'resolve' => function () {
+            'args' => [
+                'id' => ['type' => Type::id()],
+            ],
+            'resolve' => function ($root, $args) {
+                if (isset($args['id'])) {
+                    return ProductResolver::fetchProductById($args['id']);
+                }
                 return ProductResolver::fetchProducts();
             },
         ],
-        // 'product' => [
-        //     'type' => ProductType::getInstance(), // Use Singleton
-        //     'args' => [
-        //         'id' => ['type' => Type::id()],
-        //     ],
-        //     'resolve' => function ($root, $args) {
-        //         return ProductResolver::fetchProductById($args['id']);
-        //     },
-        // ],
         'categories' => [
             'type' => Type::listOf(CategoryType::getInstance()), // Use Singleton
             'resolve' => function () {
@@ -67,18 +65,7 @@ $queryType = new ObjectType([
 // Mutation Type
 $mutationType = new ObjectType([
     'name' => 'Mutation',
-    'fields' => [
-        'createOrder' => [
-            'type' => OrderType::getInstance(), // Use Singleton
-            'args' => [
-                'productId' => ['type' => Type::id()],
-                'quantity' => ['type' => Type::int()],
-            ],
-            'resolve' => function ($root, $args) {
-                return OrderResolver::createOrder($args['productId'], $args['quantity']);
-            },
-        ],
-    ],
+    'fields' => array_merge(OrderSchema::getSchema())
 ]);
 
 // Create the Schema

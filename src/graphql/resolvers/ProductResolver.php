@@ -34,9 +34,12 @@ class ProductResolver
                     pp.__typename AS price__typename,
                     pc.label AS currency_label,
                     pc.symbol AS currency_symbol,
-                    pc.__typename AS currency__typename
+                    pc.__typename AS currency__typename,
+                    pcat.name  AS category_name
                 FROM
                     products p
+                LEFT JOIN
+                    categories pcat ON p.id = pcat.product_id
                 LEFT JOIN
                     gallery pg ON p.id = pg.product_id
                 LEFT JOIN
@@ -133,4 +136,71 @@ class ProductResolver
             return ["error" => $e->getMessage()];
         }
     }
+
+    public static function fetchProductById($id)
+    {
+        $db = Database::getInstance();
+        $stmt = $db->prepare("SELECT * FROM products WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        $product= $stmt->fetch(PDO::FETCH_ASSOC);
+
+        echo(print_r($product));
+        if ($product) {
+            return [
+                'id' => $product['id'],
+                'name' => $product['name'], // Map database field to GraphQL field
+                'inStock' => $product['inStock'],
+                'description' => $product['description'],
+                'category' => $product['category'],
+                'brand' => $product['brand'],
+                'gallery' => [],
+                'attributes' => [],
+                'prices' => []
+                ];
+
+            // Add gallery image as a simple array of URLs (if not already added)
+            if ($row['image_url'] && !in_array($row['image_url'], $products[$productId]['gallery'])) {
+                $products[$productId]['gallery'][] = $row['image_url'];
+            }
+
+            // Add attribute if it exists
+            if ($row['attribute_id']) {
+                $attributeIndex = array_search($row['attribute_id'], array_column($products[$productId]['attributes'], 'id'));
+
+                if ($attributeIndex === false) {
+                    $products[$productId]['attributes'][] = [
+                        'id' => $row['attribute_id'],
+                        'name' => $row['name'],
+                        'type' => $row['type'],
+                        'items' => [],
+                        '__typename' => $row['attribute__typename'],
+                    ];
+                    $attributeIndex = array_key_last($products[$productId]['attributes']);
+                }
+
+                $existingItems = array_column($products[$productId]['attributes'][$attributeIndex]['items'], 'value');
+
+                if (!in_array($row['item_value'], $existingItems)) {
+                    $products[$productId]['attributes'][$attributeIndex]['items'][] = [
+                        'id' => $row['attribute_id'],
+                        'displayValue' => $row['item_displayValue'],
+                        'value' => $row['item_value'],
+                        '__typename' => $row['item__typename']
+                    ];
+                }
+            }
+
+            // Add price if it exists and is not already added
+            if ($row['amount'] !== null && !in_array($row['amount'], array_column($products[$productId]['prices'], 'amount'))) {
+                $products[$productId]['prices'][] = [
+                    'amount' => $row['amount'],
+                    'currency' => [
+                        'label' => $row['currency_label'], 
+                        'symbol' => $row['currency_symbol'], 
+                        '__typename' => $row['currency__typename'], 
+                    ],
+                ];
+            }
+    }
+}
 }

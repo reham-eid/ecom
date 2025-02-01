@@ -25,7 +25,13 @@ class ProductType extends ObjectType
             // },
         ],        
         'description' => ['type' => Type::string()],
-        'category' => ['type' => Type::string()],
+        'category' => [
+          'type' => Type::string(),
+          // 'resolve' => function ($parent) {
+            //     // Assuming you have a CategoryModel with a findById method
+            //     return CategoryModel::findById($parent['category_id']);
+            // }
+        ],
         'attributes' => ['type' => Type::listOf(function(){
           return AttributeSetType::getInstance();
         })],
