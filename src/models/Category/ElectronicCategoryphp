@@ -1,0 +1,25 @@
+<?php
+namespace src\models\Category;
+
+use src\models\Product\ElectronicProduct;
+
+use config\Database;
+use PDO;
+
+class ElectronicsCategory extends Category {
+  
+  public function getProducts() {
+      $db = Database::getInstance();
+      $query = "SELECT * FROM products WHERE category_id = ?";
+      $stmt = $db->prepare($query);
+      $stmt->execute([$this->id]); 
+
+      $products = [];
+      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+          $products[] = new ElectronicProduct($row['id'], $row['name'], $row['price'], $row['warranty']);
+      }
+      return $products;
+  }
+}
+
+?>

@@ -1,5 +1,5 @@
 <?php
-
+// php -S localhost:8000
 // Load dependencies
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -70,7 +70,11 @@ try {
         }
 
         header('Content-Type: application/json');
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization");
         echo json_encode($output);
+        http_response_code(200);
         exit;
     }
 
