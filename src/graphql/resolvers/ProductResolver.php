@@ -1,8 +1,8 @@
 <?php
 
-namespace graphql\resolvers;
+namespace Graphql\Resolvers;
 
-use config\Database;
+use Config\Database;
 use PDO;
 use Exception;
 
@@ -65,12 +65,13 @@ class ProductResolver
 
             $products = [];
             foreach ($rows as $row) {
+                // product class table 
                 $productId = $row['id'];
 
                 // Initialize the product if it doesn't exist
                 if (!isset($products[$productId])) {
                     $products[$productId] = [
-                        'id' => $row['id'],
+                        'id' => $row['id'], // product.setName 
                         'name' => $row['name'],
                         'inStock' => $row['inStock'],
                         'description' => $row['description'],

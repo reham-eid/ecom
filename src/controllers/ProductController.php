@@ -1,9 +1,9 @@
 <?php
 
-namespace src\controllers;
+namespace Src\Controllers;
 
 use GuzzleHttp\Psr7\Response;
-use src\repository\ProductRepository;
+use Src\Repository\ProductRepository;
 
 class ProductController{
 

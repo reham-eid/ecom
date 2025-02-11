@@ -1,21 +1,26 @@
 <?php
-namespace src\models\Price;
 
-use src\models\Currency\Currency;
+namespace src\models;
 
 class Price {
-    public $amount;
-    public $currency; // Currency object.
+    protected $pdo;
+    protected $id;
+    protected $product_id;
+    protected $amount;
+    protected $currency;
+    protected $__typename;
 
-    public function __construct(array $data) {
-        $this->amount   = $data['amount'] ?? 0;
-        if (isset($data['currency'])) {
-            $this->currency = new Currency($data['currency']);
-        }
+    public function __construct($pdo, $id, $product_id, $amount, $currency, $__typename) {
+        $this->pdo = $pdo;
+        $this->id = $id;
+        $this->product_id = $product_id;
+        $this->amount = $amount;
+        $this->currency = $currency;
+        $this->__typename = $__typename;
     }
 
-    public function __toString() {
-        return $this->currency->symbol . $this->amount;
+    public function getDetails() {
+        return "Price: $this->amount $this->currency";
     }
 }
 ?>

@@ -6,9 +6,9 @@
     },
     "autoload": {
         "psr-4": {
-            "src\\": "src/" ,
-            "config\\": "config/",
-            "graphql\\": "src/graphql/"
+            "Src\\": "Src/" ,
+            "Config\\": "Config/",
+            "Graphql\\": "Src/GraphQL/"
         }
     }
 }

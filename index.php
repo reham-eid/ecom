@@ -4,13 +4,13 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use GraphQL\Error\DebugFlag;
-use config\Database;
+use Config\Database;
 use GraphQL\GraphQL;
-use src\controllers\ProductController;
-use src\controllers\CartController;
-use src\repository\ProductRepository;
-use src\repository\CartRepository;
-use src\routes\Router;
+use Src\Controllers\ProductController;
+use Src\Controllers\CartController;
+use Src\Repository\ProductRepository;
+use Src\Repository\CartRepository;
+use Src\Routes\Router;
 use Dotenv\Dotenv;
 
 // Load environment variables

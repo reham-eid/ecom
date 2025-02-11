@@ -3,16 +3,16 @@
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
-use graphql\types\ProductType;
-use graphql\types\CategoryType;
-use graphql\types\AttributeType;
+use Graphql\Types\ProductType;
+use Graphql\Types\CategoryType;
+use Graphql\Types\AttributeType;
 // use graphql\types\OrderType;
-use graphql\resolvers\ProductResolver;
-use graphql\resolvers\CategoryResolver;
-use graphql\resolvers\AttributeResolver;
+use Graphql\Resolvers\ProductResolver;
+use Graphql\Resolvers\CategoryResolver;
+use Graphql\Resolvers\AttributeResolver;
 // use graphql\resolvers\OrderResolver;
 
-use graphql\schemas\OrderSchema;
+use Graphql\Schemas\OrderSchema;
 // Query Type
 $queryType = new ObjectType([
     'name' => 'Query',
@@ -29,20 +29,40 @@ $queryType = new ObjectType([
                 return ProductResolver::fetchProducts();
             },
         ],
-        'categories' => [
-            'type' => Type::listOf(CategoryType::getInstance()), // Use Singleton
-            'resolve' => function () {
-                return CategoryResolver::fetchCategories();
-            },
+        // 'categories' => [
+        //     'type' => Type::listOf(CategoryType::getInstance()), // Use Singleton
+        //     'resolve' => function () {
+        //         return CategoryResolver::fetchCategories();
+        //     },
+        // ],
+        // 'category' => [
+        //     'type' => CategoryType::getInstance(), // Use Singleton
+        //     'args' => [
+        //         'id' => ['type' => Type::id()],
+        //     ],
+        //     'resolve' => function ($root, $args) {
+        //         return CategoryResolver::fetchCategoryById($args['id']);
+        //     },
+        // ],
+
+        'AllCategories' => [
+            'type'    => Type::listOf(CategoryType::getInstance()),
+            'resolve' => function() {
+                return CategoryResolver::GetAllCategories();
+            }
         ],
-        'category' => [
-            'type' => CategoryType::getInstance(), // Use Singleton
-            'args' => [
-                'id' => ['type' => Type::id()],
-            ],
-            'resolve' => function ($root, $args) {
-                return CategoryResolver::fetchCategoryById($args['id']);
-            },
+        'Clothes' => [
+            'type'    => Type::listOf(CategoryType::getInstance()),
+            'resolve' => function() {
+                return CategoryResolver::GetClothes();
+                
+            }
+        ],
+        'Tech' => [
+            'type'    => Type::listOf(CategoryType::getInstance()),
+            'resolve' => function() {
+                return CategoryResolver::GetTech();
+            }
         ],
         'attributes' => [
             'type' => Type::listOf(AttributeType::getInstance()), // Use Singleton

@@ -1,11 +1,11 @@
 <?php
 
-namespace graphql\schemas;
+namespace Graphql\Schemas;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
-use graphql\resolvers\OrderResolver;
+use Graphql\Resolvers\OrderResolver;
 
 class OrderSchema
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace src\routes;
+namespace Src\Routes;
 
 use GuzzleHttp\Psr7\Response;
 

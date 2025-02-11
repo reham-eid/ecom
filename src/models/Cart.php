@@ -1,45 +1,39 @@
-<?php
+<!-- <?php
 
-namespace src\models;
+// namespace src\models;
 
-class Cart
-{
-    private $id;
-    private $userId;
-    private $productId;
-    private $quantity;
+// use src\models\Product;
 
-    public function __construct($id, $userId, $productId, $quantity)
-    {
-        $this->id = $id;
-        $this->userId = $userId;
-        $this->productId = $productId;
-        $this->quantity = $quantity;
-    }
+// class Cart {
+//     protected $pdo;
+//     protected $items = [];
 
-    // Getters and setters
-    public function getId()
-    {
-        return $this->id;
-    }
+//     public function __construct($pdo) {
+//         $this->pdo = $pdo;
+//     }
 
-    public function getUserId()
-    {
-        return $this->userId;
-    }
+//     public function addItem(Product $product, $quantity) {
+//         if (isset($this->items[$product->id])) {
+//             $this->items[$product->id]->increaseQuantity($quantity);
+//         } else {
+//             $this->items[$product->id] = new CartItem($product, $quantity);
+//         }
+//     }
 
-    public function getProductId()
-    {
-        return $this->productId;
-    }
+//     public function removeItem($productId) {
+//         unset($this->items[$productId]);
+//     }
 
-    public function getQuantity()
-    {
-        return $this->quantity;
-    }
+//     public function getTotal() {
+//         $total = 0;
+//         foreach ($this->items as $item) {
+//             $total += $item->getSubtotal();
+//         }
+//         return $total;
+//     }
 
-    public function setQuantity($quantity)
-    {
-        $this->quantity = $quantity;
-    }
-}
+//     public function getItems() {
+//         return $this->items;
+//     }
+// }
+?> -->
