@@ -7,6 +7,9 @@ use PDO;
 use Exception;
 
 use Src\Repository\ProductRepository;
+// use Src\Repository\AttributeSetRepository;
+// use Src\Models\AttributeSet\TextAttribute;
+
 
 class ProductResolver
 {
@@ -209,6 +212,7 @@ class ProductResolver
 
     public static function GetAllProducts() {
         $pdo = Database::getInstance();
+        // $attributes= new AttributeSetRepository($pdo);
         $repo = new ProductRepository($pdo);
         $products = $repo->findAll();
         return $products;
@@ -216,13 +220,17 @@ class ProductResolver
 
     public static function GetProduct($productId) {
         $pdo = Database::getInstance();
-        $repo = new ProductRepository($pdo);
+        // $attributes= new AttributeSetRepository($pdo);
+        $repo = new ProductRepository($pdo );
         $products = $repo->findById($productId);
         return $products;
     }
 
     public static function GetProductsByCategory($categoryId) {
         $pdo = Database::getInstance();
+        // $attributes= new TextAttribute($pdo);
+        // echo 'from  resolverr ';
+        // print_r($attributes );
         $repo = new ProductRepository($pdo);
         $products = $repo->getProductsByCategory($categoryId);
         return $products;

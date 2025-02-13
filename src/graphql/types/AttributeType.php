@@ -10,27 +10,42 @@ class AttributeType extends ObjectType
     // Static property to hold the single instance
     private static $instance;
 
-    // Private constructor to prevent direct instantiation
-    private function __construct()
-    {
-        $config = [
-            'name' => 'Attribute',
-            'fields' => [
-                'id' => ['type' => Type::id()],
-                'displayValue' => ['type' => Type::string()],
-                'value' => ['type' => Type::string()],
-                '__typename' => ['type' => Type::string()],
-            ],
-        ];
-        parent::__construct($config);
-    }
-
-    // Public method to access the single instance
     public static function getInstance()
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+        if (!self::$instance ) {
+            self::$instance = new ObjectType([
+            'name' => 'Attribute',
+            'fields' => [
+                'id' => [
+                    'type' => Type::id(),
+                    'resolve'=> function($items)  { 
+                        return $items->getId();
+                    },
+                ],
+                'displayValue' => [
+                    'type' => Type::string(),
+                    'resolve'=> function($items)  {
+                        return $items->getDisplayValue();
+                    },
+                ],
+                'value' => [
+                    'type' => Type::string(),
+                    'resolve'=> function($items)  {
+                        return $items->getValue();
+                    },
+                ],
+                '__typename' => [
+                    'type' => Type::string(),
+                    'resolve'=> function($items)  {
+                        return $items->getTypename();
+                    },
+                ],
+            ],
+        ]);
+
+    }
+
+    return self::$instance;
+
     }
 }

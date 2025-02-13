@@ -3,48 +3,31 @@
 namespace Src\Models\Attribute; 
 
 
-abstract class Attribute {
+class Attribute {
   protected $pdo;
   protected $id;
-  protected $name;
-  protected $items ;
-  protected $type;
+  protected $attributes_id;
+  protected $displayValue;
+  protected $value;
   protected $__typename;
 
-  public function __construct($pdo, $id, $name, array $items, $type, $__typename) {
-      $this->pdo = $pdo;
-      $this->id = $id;
-      $this->name = $name;
-      $this->items = $items;
-      $this->type = $type;
-      $this->__typename = $__typename;
+  public function __construct( $pdo , $id, $attributes_id, $displayValue, $value, $__typename) {
+    $this->pdo = $pdo;
+    $this->id = $id;
+    $this->attributes_id = $attributes_id;
+    $this->displayValue = $displayValue;
+    $this->value = $value;
+    $this->__typename = $__typename;
   }
 
-  public function getItems() {
-    return array_map(fn($item) => [
-        "id" => $item->getId(),
-        "displayValue" => $item->getDisplayValue(),
-        "value" => $item->getValue(),
-        "__typename" => $item->getTypename(),
-    ], $this->items);
-  }
+  // Getter
+  public function getId() { return $this->id; }
+  public function getAttributeId() { return $this->attributes_id; }
+  public function getDisplayValue() { return $this->displayValue; }
+  public function getValue() { return $this->value; }
+  public function getTypename() { return $this->__typename; }
 
-}
-  // abstract public function getItems();
+
   
-  // abstract public function getValue();
-
-// class SizeAttribute extends Attribute {
-//   public function getValue() {
-//       return "Size: $this->name";
-//   }
-// }
-
-// class ColorAttribute extends Attribute {
-//   public function getValue() {
-//       return "Color: $this->name";
-//   }
-// }
-
+}
 ?>
-

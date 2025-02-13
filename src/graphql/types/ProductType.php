@@ -52,9 +52,15 @@ class ProductType extends ObjectType
                 return $product->getCategory();
               }
             ],
-            'attributes' => ['type' => Type::listOf(function(){
-              return AttributeSetType::getInstance();
-            })],
+            'attributes' => ['type' => Type::listOf(AttributeSetType::getInstance()),
+            'resolve' => function ($root, $args) {
+              error_log("root from getAttributes productType: " . print_r($root, true));
+    
+              return method_exists($root, 'getAttributes') ? $root->getAttributes() : [];
+          
+              },
+
+            ],
             'prices' => [
               'type' => Type::listOf(PriceType::getInstance() ),
               'resolve' => function ($root, $args) {

@@ -2,17 +2,22 @@
 namespace Src\Repository;
 
 use PDO;
-use Src\Models\Category\AllCategory;
+use Src\Models\Category\AllCategory; 
 use Src\Models\Price\Price;
 use Src\Models\Currency\Currency;
 use Src\Models\Gallery\Gallery;
 use Src\Factory\ProductFactory;
+use Src\Models\Attribute\Attribute;
+use Src\Models\AttributeSet\TextAttribute;
+// use Src\Repository\AttributeSetRepository;
 
 class ProductRepository{
     private $pdo;
+    // private $attributeRepository; 
 
     public function __construct(PDO $pdo){
         $this->pdo = $pdo;
+        // $this->attributeRepository = $attributeRepository; 
     }
 
     public function findById($id) {
@@ -53,20 +58,67 @@ class ProductRepository{
         // }
         
         // Fetch Attributes
-        // $stmt = $this->pdo->prepare("SELECT * FROM attributes WHERE product_id = :product_id");
-        // $stmt->execute(['product_id' => $id]);
-        // $attributesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // $attributes = $this->attributeRepository->getAttributesByProductId($id);
+        // $query = '
+        // SELECT   
+        //     a.attributes_id,  
+        //     a.id AS attribute_id,  
+        //     a.product_id,  
+        //     a.name AS attribute_name,  
+        //     a.type AS attribute_type,  
+        //     a.__typename AS attribute_typename,  
+        //     i.items_id,  
+        //     i.id AS item_id,  
+        //     i.displayValue,  
+        //     i.value,  
+        //     i.__typename AS item_typename  
+        // FROM   
+        //     attributes a  
+        // LEFT JOIN   
+        //     items i ON a.attributes_id = i.attribute_id  
+        // WHERE
+        //     a.product_id = :product_id
+        // ORDER BY   
+        //     a.attributes_id;';
+        $stmt = $this->pdo->prepare("SELECT * FROM attributes WHERE product_id = :product_id");
+        $stmt->execute(['product_id' => $id]);
+        $attributesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // $attributes = [];
-        // foreach ($attributesData as $attr) {
-        //     $attributes[] = new Attribute(
-        //         $this->pdo, 
-        //         $attr['id'], 
-        //         $attr['name'], 
-        //         $attr['type'], 
-        //         $attr['__typename']
-        //     );
-        // }
+        var_dump($id); 
+        echo 'from product reppppppo    ';
+        echo json_encode($attributesData);
+
+        $attributes = [];
+        foreach ($attributesData as $attr) {
+            $attributeStmt = $this->pdo->prepare("SELECT * FROM items WHERE attribute_id = :attribute_id");
+            $attributeStmt->execute(['attribute_id' => $attr['attributes_id']]);
+            $attributeData = $attributeStmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($attributeData) {
+                $attribute_items = new Attribute(
+                    $this->pdo, 
+                    $attr['id'], 
+                    $attr['attributes_id'], 
+                    $attributeData['displayValue'] ?? 'N/A',  
+                    $attributeData['value'] ?? 'N/A', 
+                    $attributeData['__typename'] ?? 'Unknown'
+                );
+
+                $attributes[] = new TextAttribute(
+                    $this->pdo, 
+                    $attr['id'],
+                    $attr['name'],
+                    $attr['product_id'],
+                    $attribute_items,
+                    $attr['type'],
+                    $attr['__typename']
+                );
+            }
+            
+            echo 'from product reppppppo   attributes 🥲';
+            var_dump($attributes);
+            echo json_encode($attributes);
+        };
 
         // Fetch prices
         $stmt = $this->pdo->prepare("SELECT * FROM prices WHERE product_id = :product_id");
@@ -91,7 +143,8 @@ class ProductRepository{
             $prices[] = new Price($this->pdo, $price['id'], $id, $amount, $currency, $price['__typename']);
         }
         // var_dump($prices); die();
-        return ProductFactory::create($this->pdo, $productData, $prices, $gallery , $category);
+        $products = ProductFactory::create($this->pdo, $productData, $prices, $gallery, $category, $attributes);
+        return $products;
     }
 
     public function findAll() {

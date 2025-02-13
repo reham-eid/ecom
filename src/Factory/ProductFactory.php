@@ -4,13 +4,17 @@ namespace Src\Factory;
 
 use Src\Models\Product\ConfigurableProduct;
 use Src\Models\Product\SimpleProduct;
-use Src\Repository\AttributeRepository;
+use PDO;
+use Src\Models\Gallery\Gallery;
+use Src\Models\Category\AllCategory;
 
 class ProductFactory {
-    public static function create($pdo, $productData, $prices, $gallery, $category) {
-        $attributeRepository = new AttributeRepository($pdo);
-        $attributes = $attributeRepository->getAttributesByProductId($productData['id']);
+    public static function create($pdo, $productData, $prices, $gallery, $category, $attributes ) {
+        $attributes = is_array($attributes) ? $attributes : []; 
+        echo 'from ProductFactory reppppppo   attributes 🥲';
+            var_dump($attributes);
 
+            echo json_encode($attributes);
         if (!empty($attributes)) {
             return new ConfigurableProduct(
                 $pdo,
@@ -36,6 +40,7 @@ class ProductFactory {
                 $prices,
                 $gallery,
                 $productData['brand'],
+                $attributes,
                 $productData['__typename']
             );
         }

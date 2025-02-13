@@ -17,7 +17,7 @@ abstract class Product {
     protected $attributes = [];
     protected $gallery;
     protected array $prices; 
-    protected string $__typename;
+    protected $__typename;
 
     public function __construct(
         $pdo,
@@ -28,9 +28,10 @@ abstract class Product {
         Category $category, 
         array $prices,
         Gallery $gallery, 
-        // Attribute $attribute, 
         $brand, 
-        $__typename) {
+        $__typename,
+        array $attributes,
+        ) {
         $this->pdo = $pdo;
         $this->id = $id;
         $this->name = $name;
@@ -40,6 +41,7 @@ abstract class Product {
         $this->prices = $prices; 
         $this->gallery = $gallery; 
         $this->brand = $brand;
+        $this->attributes = $attributes ?? [];
         $this->__typename = $__typename;
     }
 
@@ -53,11 +55,9 @@ abstract class Product {
     public function getPrices() { return $this->prices; }
     public function getBrand() { return $this->brand; }
     public function getTypename() { return $this->__typename; }
-
-    // public function getAttributes() {
-    //     return $this->attributes;
-    // }
-
+    public function getAttributes() {
+        return is_array($this->attributes) ? $this->attributes : [];
+    }
     abstract public function getDetails();
 
     // abstract public function loadAttributes();

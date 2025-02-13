@@ -43,7 +43,7 @@ $queryType = new ObjectType([
                 'categoryId' => ['type' => Type::id()],
             ],
             'resolve' => function($root, $args ) {
-                return ProductResolver::GetProduct($args['categoryId']);  
+                return ProductResolver::GetProductsByCategory($args['categoryId']);  
             },
         ],
         // 'categories' => [

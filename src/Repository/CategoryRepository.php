@@ -23,7 +23,7 @@ class CategoryRepository {
           if (!isset($row['id']) || $row['id'] === null) {
             // You might log an error here or throw an exception
             error_log("Category row missing id: " . print_r($row, true));
-        }
+          }
             $categories[] = CategoryFactory::create($this->pdo, $row);
         }
         // echo "Categories fetched from repository";
