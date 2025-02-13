@@ -9,24 +9,35 @@ class CurrencyType extends ObjectType
 {
     private static $instance;
     
-    private function __construct()
-    {
-        $config = [
+    public static function getInstance() {
+
+    if (!self::$instance) {
+        self::$instance = new ObjectType([
             'name' => 'Currency',
             'fields' => [
-                'label' => ['type' => Type::string()],
-                'symbol' => ['type' => Type::string()],
-                '__typename' =>['type' => Type::string()],
+                'label' => [
+                    'type'    => Type::string(),
+                    'resolve' => function($currency) {
+                        return $currency->getLabel();
+                    }
+                ],
+                'symbol' => [
+                    'type'    => Type::string(),
+                    'resolve' => function($currency) {
+                        return $currency->getSymbol();
+                    }
+                ],
+                '__typename' => [
+                    'type'    => Type::string(),
+                    'resolve' => function($currency) {
+                        return $currency->getTypename();
+                    }
+                ],
             ],
-        ];
-        parent::__construct($config);
+        ]);
+    }
+    return self::$instance;
+
     }
 
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
 }

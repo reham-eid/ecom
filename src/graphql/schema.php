@@ -23,10 +23,27 @@ $queryType = new ObjectType([
                 'id' => ['type' => Type::id()],
             ],
             'resolve' => function ($root, $args) {
-                if (isset($args['id'])) {
-                    return ProductResolver::fetchProductById($args['id']);
-                }
-                return ProductResolver::fetchProducts();
+                    return ProductResolver::GetAllProducts();
+            }
+        ],
+
+        'product' => [
+            'type' => ProductType::getInstance(),  
+            'args' => [
+                'id' => ['type' => Type::id()],
+            ],
+            'resolve' => function ($root, $args) {
+                return ProductResolver::GetProduct($args['id']);  
+            },
+        ],
+
+        'productsByCategory' => [
+            'type' => Type::listOf(ProductType::getInstance()),
+            'args' => [
+                'categoryId' => ['type' => Type::id()],
+            ],
+            'resolve' => function($root, $args ) {
+                return ProductResolver::GetProduct($args['categoryId']);  
             },
         ],
         // 'categories' => [

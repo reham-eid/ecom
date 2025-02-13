@@ -6,6 +6,8 @@ use Config\Database;
 use PDO;
 use Exception;
 
+use Src\Repository\ProductRepository;
+
 class ProductResolver
 {
     public static function fetchProducts()
@@ -203,5 +205,28 @@ class ProductResolver
                 ];
             }
     }
+    }
+
+    public static function GetAllProducts() {
+        $pdo = Database::getInstance();
+        $repo = new ProductRepository($pdo);
+        $products = $repo->findAll();
+        return $products;
+    }
+
+    public static function GetProduct($productId) {
+        $pdo = Database::getInstance();
+        $repo = new ProductRepository($pdo);
+        $products = $repo->findById($productId);
+        return $products;
+    }
+
+    public static function GetProductsByCategory($categoryId) {
+        $pdo = Database::getInstance();
+        $repo = new ProductRepository($pdo);
+        $products = $repo->getProductsByCategory($categoryId);
+        return $products;
+    }
 }
-}
+
+?>

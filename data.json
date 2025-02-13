@@ -405,29 +405,10 @@
                 "gallery": [
                     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-12-pro-family-hero?wid=940&amp;hei=1112&amp;fmt=jpeg&amp;qlt=80&amp;.v=1604021663000"
                 ],
-                "description": "This is iPhone 12. Nothing else to say.",
+                "description": 
+                "This is iPhone 12. Nothing else to say.",
                 "category": "tech",
                 "attributes": [
-                    {
-                        "id": "Capacity",
-                        "items": [
-                            {
-                                "displayValue": "512G",
-                                "value": "512G",
-                                "id": "512G",
-                                "__typename": "Attribute"
-                            },
-                            {
-                                "displayValue": "1T",
-                                "value": "1T",
-                                "id": "1T",
-                                "__typename": "Attribute"
-                            }
-                        ],
-                        "name": "Capacity",
-                        "type": "text",
-                        "__typename": "AttributeSet"
-                    },
                     {
                         "id": "Color",
                         "items": [
@@ -464,6 +445,26 @@
                         ],
                         "name": "Color",
                         "type": "swatch",
+                        "__typename": "AttributeSet"
+                    },
+                    {
+                        "id": "Capacity",
+                        "items": [
+                            {
+                                "displayValue": "512G",
+                                "value": "512G",
+                                "id": "512G",
+                                "__typename": "Attribute"
+                            },
+                            {
+                                "displayValue": "1T",
+                                "value": "1T",
+                                "id": "1T",
+                                "__typename": "Attribute"
+                            }
+                        ],
+                        "name": "Capacity",
+                        "type": "text",
                         "__typename": "AttributeSet"
                     }
                 ],

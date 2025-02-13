@@ -1,10 +1,10 @@
 <?php
 
-namespace src\models; 
+namespace Src\Models\Product; 
 
-use src\models\Category; 
+use Src\Models\Category\Category; 
+use Src\Models\Gallery\Gallery;
 
-use PDO ; 
 
 abstract class Product {
     protected $pdo;
@@ -15,53 +15,63 @@ abstract class Product {
     protected $category;
     protected $brand;
     protected $attributes = [];
-    protected $gallery = [];
-    protected $prices = [];
-    protected $__typename;
+    protected $gallery;
+    protected array $prices; 
+    protected string $__typename;
 
-    public function __construct($pdo, $id, $name, $inStock, $description, Category $category, $brand, $__typename) {
+    public function __construct(
+        $pdo,
+        $id,
+        $name, 
+        $inStock, 
+        $description, 
+        Category $category, 
+        array $prices,
+        Gallery $gallery, 
+        // Attribute $attribute, 
+        $brand, 
+        $__typename) {
         $this->pdo = $pdo;
         $this->id = $id;
         $this->name = $name;
         $this->inStock = $inStock;
         $this->description = $description;
-        $this->category = $category; // get name
+        $this->category = $category; 
+        $this->prices = $prices; 
+        $this->gallery = $gallery; 
         $this->brand = $brand;
         $this->__typename = $__typename;
     }
 
+    
+    public function getId() { return $this->id; }
+    public function getName() { return $this->name; }
+    public function getInStock() { return $this->inStock; }
+    public function getDescription() { return $this->description; }
+    public function getGallery() { return $this->gallery->getImages(); }
+    public function getCategory() { return $this->category; }
+    public function getPrices() { return $this->prices; }
+    public function getBrand() { return $this->brand; }
+    public function getTypename() { return $this->__typename; }
+
+    // public function getAttributes() {
+    //     return $this->attributes;
+    // }
+
     abstract public function getDetails();
 
-    abstract public function loadAttributes();
+    // abstract public function loadAttributes();
     // public function loadAttributes() {
     //     $stmt = $this->pdo->prepare('SELECT * FROM attributes WHERE product_id = :product_id');
     //     $stmt->execute(['product_id' => $this->id]);
     //     $this->attributes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     // }
 
-    public function loadGallery() {
-        $stmt = $this->pdo->prepare('SELECT * FROM gallery WHERE product_id = :product_id');
-        $stmt->execute(['product_id' => $this->id]);
-        $this->gallery = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function loadPrices() { // abstract
-        // each product has a diff array 
-        $stmt = $this->pdo->prepare('SELECT * FROM prices WHERE product_id = :product_id');
-        $stmt->execute(['product_id' => $this->id]);
-        $this->prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
     // public function getAttributes() {
     //     return $this->attributes;
     // }
 
-    public function getGallery() {
-        return $this->gallery;
-    }
 
-    public function getPrices() {
-        return $this->prices;
-    }
 }
 ?>

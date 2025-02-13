@@ -15,7 +15,7 @@ class CategoryType {
                 'fields' => [
                     'id' => [
                         'type'    => Type::nonNull(Type::id()),
-                        'resolve' => function($category, $args, $context, $info) {
+                        'resolve' => function($category ) {
                             return $category->getId();
                         }
                     ],

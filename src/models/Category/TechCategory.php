@@ -2,14 +2,8 @@
 
 namespace Src\Models\Category;  
 
-class TechCategory extends Category
-{
-  public function getDetails(): array
-  {
-      return [
-          'id' => $this->id,
-          'name' => $this->name,
-          'type' => $this->__typename
-      ];
-  }
-} 
+use Src\Models\Category\Category;
+
+class TechCategory extends Category{}
+
+?>

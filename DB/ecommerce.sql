@@ -11,6 +11,20 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(100) NOT NULL UNIQUE,
     __typename VARCHAR(50) NOT NULL DEFAULT 'Category'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS clothing_attributes (
+    category_id INT NOT NULL,
+    size_chart TEXT,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE IF NOT EXISTS electronics_attributes (
+    category_id INT NOT NULL,
+    warranty_period INT,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -----------------------------------------------------
 -- Products Table
 -----------------------------------------------------
@@ -19,7 +33,7 @@ CREATE TABLE IF NOT EXISTS products (
     name VARCHAR(255) NOT NULL,
     inStock BOOLEAN NOT NULL,
     description TEXT,
-    category INT,  -- This should reference categories.id (numeric)
+    category INT,   
     brand VARCHAR(100),
     __typename VARCHAR(50) NOT NULL DEFAULT 'Product',
     CONSTRAINT fk_products_category FOREIGN KEY (category)
@@ -44,7 +58,8 @@ CREATE TABLE IF NOT EXISTS gallery (
 -- Attributes Table (One-to-Many: Products → Attributes)
 -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS attributes (
-    id VARCHAR(50) PRIMARY KEY,
+    attributes_id INT AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(50) ,
     product_id VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,
     type VARCHAR(50) NOT NULL,
@@ -59,13 +74,14 @@ CREATE TABLE IF NOT EXISTS attributes (
 -- Attribute Items Table (One-to-Many: Attributes → Items)
 -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS items (
-    id VARCHAR(50) PRIMARY KEY,
-    attribute_id VARCHAR(50) NOT NULL,
+    items_id INT AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(50) ,
+    attribute_id INT,
     displayValue VARCHAR(100) NOT NULL,
     value VARCHAR(100) NOT NULL,
     __typename VARCHAR(50) NOT NULL DEFAULT 'Attribute',
     CONSTRAINT fk_items_attribute FOREIGN KEY (attribute_id)
-        REFERENCES attributes(id)
+        REFERENCES attributes(attributes_id)
         ON DELETE CASCADE,
     INDEX idx_items_attribute (attribute_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -147,20 +163,32 @@ CREATE TABLE IF NOT EXISTS order_items (
 INSERT INTO categories (name, __typename)
 VALUES ('clothes', 'Category');
 
+INSERT INTO categories (name, __typename)
+VALUES ('tech', 'Category');
+
+INSERT INTO categories (name, __typename)
+VALUES ('all', 'Category');
+
 -- Insert a product (ensure the category column is a numeric ID; here assuming "clothes" has id=1)
 INSERT INTO products (id, name, inStock, description, category, brand, __typename)
-VALUES ('jacket-canada-goosee', 'Jacket', TRUE, '<p>Awesome winter jacket</p>', 1, 'Canada Goose', 'Product');
+VALUES ('apple-imac-2021', 'iMac 2021', FALSE, 
+"The new iMac!",
+2, 'Apple', 'Product');
 
 -- Insert gallery images for the product
 INSERT INTO gallery (product_id, image_url)
 VALUES
-    ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016105/product-image/2409L_61.jpg'),
-    ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016107/product-image/2409L_61_a.jpg'),
-    ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016108/product-image/2409L_61_b.jpg'),
-    ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016109/product-image/2409L_61_c.jpg'),
-    ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016110/product-image/2409L_61_d.jpg'),
-    ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_1333,c_scale,f_auto,q_auto:best/v1634058169/product-image/2409L_61_o.png'),
-    ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_1333,c_scale,f_auto,q_auto:best/v1634058159/product-image/2409L_61_p.png');
+    ('apple-imac-2021', 
+      "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/imac-24-blue-selection-hero-202104?wid=904&hei=840&fmt=jpeg&qlt=80&.v=1617492405000"
+    );
+--     ('jacket-canada-goosee', 
+--     'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016107/product-image/2409L_61_a.jpg'
+--     ),
+--     ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016108/product-image/2409L_61_b.jpg'),
+--     ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016109/product-image/2409L_61_c.jpg'),
+--     ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_480,c_scale,f_auto,q_auto:best/v1576016110/product-image/2409L_61_d.jpg'),
+--     ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_1333,c_scale,f_auto,q_auto:best/v1634058169/product-image/2409L_61_o.png'),
+--     ('jacket-canada-goosee', 'https://images.canadagoose.com/image/upload/w_1333,c_scale,f_auto,q_auto:best/v1634058159/product-image/2409L_61_p.png');
 
 -- Insert an attribute "Size" for the product
 INSERT INTO attributes (id, product_id, name, type, __typename)
@@ -180,19 +208,32 @@ VALUES ('USD', '$', 'Currency');
 
 -- Insert price for the product
 INSERT INTO prices (product_id, amount, currency, __typename)
-VALUES ('jacket-canada-goosee', 518.47, 'USD', 'Price');
+VALUES ('apple-imac-2021', 1688.03, 'USD', 'Price');
+
 
 -- Insert an attribute "Color" for the product
-INSERT INTO attributes (id, product_id, name, type, __typename)
-VALUES ('Color', 'jacket-canada-goosee', 'Color', 'text', 'AttributeSet');
+INSERT INTO attributes (attributes_id , id, product_id, name, type, __typename)
+VALUES (2, 'Color', 'apple-iphone-12-pro', 'Color', 'swatch', 'AttributeSet');
 
 -- Insert attribute items for "Color"
 INSERT INTO items (id, attribute_id, displayValue, value, __typename)
 VALUES
-    ('White', 'Color', 'White', '#FFFFFF', 'Attribute'),
-    ('Blue', 'Color', 'Blue', '#030BFF', 'Attribute'),
-    ('Green', 'Color', 'Green', '#44FF03', 'Attribute');
+    ('Green', 2 , 'Green', '#44FF03', 'Attribute'),
+    ('Cyan',  2 , 'Cyan', '#03FFF7', 'Attribute'),
+    ('Blue',  2 , 'Blue', '#030BFF', 'Attribute'),
+    ('Black',  2 , 'Black', '#000000', 'Attribute'),
+    ('White', 2 , 'White', '#FFFFFF', 'Attribute');
+    
+    -- Insert an attribute "Capacity" for the product
+INSERT INTO attributes (attributes_id , id, product_id, name, type, __typename)
+VALUES (3 , 'Capacity', 'apple-imac-2021', 'Capacity', 'text', 'AttributeSet');
 
+-- Insert attribute items for "Capacity"
+INSERT INTO items (id, attribute_id, displayValue, value, __typename)
+VALUES
+    ('256GB', 3 , '256GB', '256GB', 'Attribute'),
+    ('256GB', 3 , '256GB', '256GB', 'Attribute');
+    
 -- Insert a user
 INSERT INTO users (username, email)
 VALUES ('reham_eid', 'reham@example.com');
@@ -214,3 +255,32 @@ JOIN users u ON o.user_id = u.id
 WHERE u.id = 1;
 
 
+ALTER TABLE items ADD CONSTRAINT fk_items_attribute FOREIGN KEY (attribute_id)
+        REFERENCES attributes(attributes_id)
+        ON DELETE CASCADE;
+ALTER TABLE items DROP attribute_id;
+ALTER TABLE items DROP FOREIGN KEY fk_items_attribute;
+
+SELECT CONSTRAINT_NAME 
+FROM information_schema.KEY_COLUMN_USAGE 
+WHERE TABLE_NAME = 'items' AND COLUMN_NAME = 'attribute_id';
+
+SELECT 
+    TABLE_NAME, 
+    COLUMN_NAME, 
+    CONSTRAINT_NAME, 
+    REFERENCED_TABLE_NAME, 
+    REFERENCED_COLUMN_NAME
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE TABLE_NAME = 'items' 
+AND COLUMN_NAME = 'attribute_id';
+SELECT * FROM items WHERE attribute_id IS NULL;
+
+ALTER TABLE items ADD COLUMN items_id INT AUTO_INCREMENT PRIMARY KEY;
+
+ALTER TABLE items ADD COLUMN attribute_id INT;
+
+
+ALTER TABLE attributes DROP PRIMARY KEY;
+ALTER TABLE attributes ADD COLUMN attributes_id INT AUTO_INCREMENT PRIMARY KEY;
+ALTER TABLE attributes ADD COLUMN id VARCHAR(50);

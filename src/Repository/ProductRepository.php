@@ -2,160 +2,132 @@
 namespace Src\Repository;
 
 use PDO;
-
+use Src\Models\Category\AllCategory;
+use Src\Models\Price\Price;
+use Src\Models\Currency\Currency;
+use Src\Models\Gallery\Gallery;
+use Src\Factory\ProductFactory;
 
 class ProductRepository{
-  private $pdo;
+    private $pdo;
 
-  public function __construct(PDO $pdo){
-    $this->pdo = $pdo;
-  }
+    public function __construct(PDO $pdo){
+        $this->pdo = $pdo;
+    }
 
-  public function findAll(): array {
-    try {
-        // Define the SQL query
-        $sql = "
-            SELECT distinct 
-                p.id,
-                p.name AS product_name,
-                p.inStock,
-                p.description,
-                p.category,
-                p.brand,
-                p.__typename AS product__typename,
-                pg.image_url,
-                pa.id AS attribute_id,
-                pa.name,
-                pa.type,
-                pa.__typename AS attribute__typename,
-                ai.displayValue AS item_displayValue,
-                ai.value AS item_value,
-                ai.__typename AS item__typename,
-                pp.amount,
-                pp.currency,
-                pp.__typename AS price__typename,
-                pc.label AS currency_label,
-                pc.symbol AS currency_symbol,
-                pc.__typename AS currency__typename
-            FROM
-                products p
-            LEFT JOIN
-                gallery pg ON p.id = pg.product_id
-            LEFT JOIN
-                attributes pa ON p.id = pa.product_id
-            LEFT JOIN
-                items ai ON pa.id = ai.attribute_id
-            LEFT JOIN
-                prices pp ON p.id = pp.product_id
-            LEFT JOIN
-                currency pc ON pp.currency = pc.label;";
+    public function findById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM products WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        $productData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Execute the query
-        $stmt = $this->pdo->query($sql);
-        if (!$stmt->execute()) {
-            print_r($stmt->errorInfo()); // Show SQL error
+        print_r($productData);
+        if (!$productData) {
+            http_response_code(404);
+            return ["error" => "No products found!"]; // No product found
         }
-        // Fetch all results as an associative array
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Process the rows to group data into nested arrays
+        // Fetch Category
+        $categoryStmt = $this->pdo->prepare("SELECT * FROM categories WHERE id = :id");
+        $categoryStmt->execute(['id' => $productData['category']]);
+        $categoryData = $categoryStmt->fetch(PDO::FETCH_ASSOC);
+
+        $category = new AllCategory(
+            $this->pdo,
+            $categoryData['id'],
+            $categoryData['name'],
+            $categoryData['__typename'],
+        );
+
+
+        // Fetch Gallery 
+        $stmt = $this->pdo->prepare('SELECT image_url FROM gallery WHERE product_id = :product_id');
+        $stmt->execute(['product_id' => $id]);
+        $galleryData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $galleryImages = array_map(fn($row) => $row['image_url'], $galleryData);
+
+        $gallery = new Gallery($this->pdo, $id, $galleryImages) ;
+
+        // foreach ($galleryData as $image) {
+        //     $gallery[] = new Gallery($this->pdo, $image['id'], $id, $image['image_url']);
+        // }
+        
+        // Fetch Attributes
+        // $stmt = $this->pdo->prepare("SELECT * FROM attributes WHERE product_id = :product_id");
+        // $stmt->execute(['product_id' => $id]);
+        // $attributesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // $attributes = [];
+        // foreach ($attributesData as $attr) {
+        //     $attributes[] = new Attribute(
+        //         $this->pdo, 
+        //         $attr['id'], 
+        //         $attr['name'], 
+        //         $attr['type'], 
+        //         $attr['__typename']
+        //     );
+        // }
+
+        // Fetch prices
+        $stmt = $this->pdo->prepare("SELECT * FROM prices WHERE product_id = :product_id");
+        $stmt->execute(['product_id' => $id]);
+        $pricesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // print_r($pricesData);
+        $prices = [];
+        foreach ($pricesData as $price) {
+            $currencyStmt = $this->pdo->prepare("SELECT * FROM currency WHERE label = :label");
+            $currencyStmt->execute(['label' => $price['currency']]);
+            $currencyData = $currencyStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$currencyData) {
+                error_log("⚠️ currency not found " . $price['currency']);
+                $currency = null;
+            } else {
+                $currency = new Currency($this->pdo, $currencyData['label'], $currencyData['symbol'], $currencyData['__typename']);
+            }
+            $amount = $price['amount'] ?? 0;
+            // $currency = new Currency($this->pdo, $currencyData['label'], $currencyData['symbol'], $currencyData['__typename']);
+            $prices[] = new Price($this->pdo, $price['id'], $id, $amount, $currency, $price['__typename']);
+        }
+        // var_dump($prices); die();
+        return ProductFactory::create($this->pdo, $productData, $prices, $gallery , $category);
+    }
+
+    public function findAll() {
+        $stmt = $this->pdo->query("SELECT * FROM products");
+        $productsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$productsData) {
+            http_response_code(404);
+            return ["error" => "No products found!"]; // No product found
+        }
+
         $products = [];
-        foreach ($rows as $row) {
-            $productId = $row['id'];
-
-            // Initialize the product if it doesn't exist
-            if (!isset($products[$productId])) {
-                $products[$productId] = [
-                    'id' => $row['id'],
-                    'name' => $row['product_name'],
-                    'inStock' => $row['inStock'],
-                    'description' => $row['description'],
-                    'category' => $row['category'],
-                    'brand' => $row['brand'],
-                    '__typename' => $row['product__typename'],
-                    'gallery' => [],
-                    'attributes' => [],
-                    'prices' => []
-                ];
-            }
-
-           // Add gallery image as a simple array of URLs (if not already added)
-            if ($row['image_url'] && !in_array($row['image_url'], $products[$productId]['gallery'])) {
-                $products[$productId]['gallery'][] = $row['image_url'];
-            }
-
-            // Add attribute if it exists and is not already added
-            // Add attribute if it exists
-            if ($row['attribute_id']) {
-                // Find the attribute in the array
-                $attributeIndex = array_search($row['attribute_id'], array_column($products[$productId]['attributes'], 'id'));
-
-                if ($attributeIndex === false) {
-                    // If attribute does not exist, add it
-                    $products[$productId]['attributes'][] = [
-                        'id' => $row['attribute_id'],
-                        'name' => $row['name'],
-                        'type' => $row['type'],
-                        'items' => [],
-                        '__typename' => $row['attribute__typename'],
-                    ];
-                    // Update index since we just added the attribute
-                    $attributeIndex = array_key_last($products[$productId]['attributes']);
-                }
-
-                // Ensure items are unique inside the attribute
-                $existingItems = array_column($products[$productId]['attributes'][$attributeIndex]['items'], 'value');
-                
-                if (!in_array($row['item_value'], $existingItems)) {
-                    $products[$productId]['attributes'][$attributeIndex]['items'][] = [
-                        'id' => $row['attribute_id'],
-                        'displayValue' => $row['item_displayValue'],
-                        'value' => $row['item_value'],
-                        '__typename' => $row['item__typename']
-                    ];
-                }
-            }
-
-
-            // Add price if it exists and is not already added
-            if ($row['amount'] !== null && !in_array($row['amount'], array_column($products[$productId]['prices'], 'amount'))) {
-                $products[$productId]['prices'][] = [
-                    'amount' => $row['amount'],
-                    'currency' => [
-                        'label' => $row['currency_label'], 
-                        'symbol' => $row['currency_symbol'], 
-                        '__typename' => $row['currency__typename'], 
-                    ],
-                ];
-            }
+        foreach ($productsData as $productData) {
+            $products[] = $this->findById($productData['id']);
         }
 
-      // Convert associative array to indexed array
-        $products = array_values($products);
-        // Log the fetched products for debugging
-        // error_log("Fetched products: " . json_encode($products));
-
-        // Return the fetched products
         return $products;
-    } catch (\PDOException $e) {
-        // Log any errors that occur
-        error_log("Error fetching products: " . $e->getMessage());
-        return [];
     }
-}
 
-  public function find($id): object {
-    try {
-      $stmt = $this->pdo->prepare("SELECT * FROM `products` WHERE id = :id");
-      $stmt->execute(['id' => $id]);
-      $product = $stmt->fetch(PDO::FETCH_ASSOC);
-      error_log("Fetched products: " . json_encode($product));
-      return $product;
-    } catch (\PDOException $e) {
-        // Log any errors that occur
-        error_log("Error fetching products: " . $e->getMessage());
+    public function getProductsByCategory($categoryId) {
+        $stmt = $this->pdo->prepare("SELECT * FROM products WHERE category = :categoryId");
+        $stmt->execute(['categoryId' => $categoryId]);
+        $productsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        if (!$productsData) {
+            http_response_code(404);
+            return ["error" => "No products found for this category!"];
+        }
+    
+        $products = [];
+        foreach ($productsData as $productData) {
+            $products[] = $this->findById($productData['id']);
+        }
+    
+        return $products;
     }
+    
 }
-}
-
 ?>

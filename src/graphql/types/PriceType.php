@@ -9,25 +9,34 @@ class PriceType extends ObjectType
 {
     private static $instance;
 
-    private function __construct()
-    {
-        $config = [
-            'name' => 'Price',
-            'fields' => [
-                'amount' => ['type' => Type::float()],
-                'currency' => ['type' => CurrencyType::getInstance()],
-                '__typename' =>['type' => Type::string()],
-            ],
-        ];
-        
-        parent::__construct($config);
-    }
-
     public static function getInstance()
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
+        if (!self::$instance ) {
+            self::$instance = new ObjectType([
+                'name' => 'Price',
+                'fields' => [
+                    'amount' => [
+                        'type' => Type::float() ,
+                        'resolve' => function ($price) {
+                            return method_exists($price, 'getAmount') ? $price->getAmount() : null;
+                        }
+                    ],
+                    'currency' => [
+                        'type' => CurrencyType::getInstance(),
+                        'resolve' => function ($price) {
+                            return method_exists($price, 'getCurrency') ? $price->getCurrency() : null;
+                        }
+                    ],
+                    '__typename' => [
+                        'type' => Type::string(),
+                        'resolve' => function ($price) {
+                            return $price->getTypename();
+                        }
+                    ],
+                ],
+            ]);
         }
+    
         return self::$instance;
     } 
 }

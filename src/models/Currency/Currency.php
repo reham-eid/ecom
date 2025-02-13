@@ -1,6 +1,6 @@
 <?php
 
-namespace src\models;
+namespace Src\Models\Currency;
 
 class Currency {
     protected $pdo;
@@ -15,8 +15,13 @@ class Currency {
         $this->__typename = $__typename;
     }
 
+      // Getters
+    public function getLabel() { return $this->label; }
+    public function getSymbol() { return $this->symbol; }
+    public function getTypename() { return $this->__typename; }
+
     public function getDetails() {
-        return "$this->label ($this->symbol)";
+        return "{$this->label} ({$this->symbol})";
     }
 }
 ?>

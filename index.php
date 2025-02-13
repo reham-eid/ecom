@@ -2,6 +2,7 @@
 // php -S localhost:8000
 // Load dependencies
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/errorHandlers.php';
 
 use GraphQL\Error\DebugFlag;
 use Config\Database;
@@ -64,17 +65,25 @@ try {
 
             $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
             $output = $result->toArray($debugFlags);
+
+            if (isset($output['errors'])) {
+                http_response_code(400); 
+            }
         } catch (Exception $e) {
-            http_response_code(500);
             $output = ['errors' => [['message' => $e->getMessage()]]];
+            if (isset($output['errors'])) {
+                http_response_code(500);
+            }
+            echo json_encode($output);
+            exit; 
         }
 
         header('Content-Type: application/json');
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
         header("Access-Control-Allow-Headers: Content-Type, Authorization");
+        // http_response_code(200);
         echo json_encode($output);
-        http_response_code(200);
         exit;
     }
 
@@ -114,3 +123,5 @@ try {
         ]);
     exit;
 }
+
+?>

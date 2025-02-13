@@ -55,10 +55,10 @@ class CategoryResolver
         public static function GetAllCategories() {
             $pdo = Database::getInstance();
             $repo = new CategoryRepository($pdo);
-            echo "Fetching all categories";
+            // echo "Fetching all categories";
             $categories = $repo->fetchAllCategories();
-            echo "Categories fetched from resolver ";
-            echo json_encode($categories);
+            // echo "Categories fetched from resolver ";
+            // echo json_encode($categories);
             return  $categories;
         }
     // }

@@ -26,14 +26,14 @@ class CategoryRepository {
         }
             $categories[] = CategoryFactory::create($this->pdo, $row);
         }
-        echo "Categories fetched from repository";
-        echo json_encode($categories);
+        // echo "Categories fetched from repository";
+        // echo json_encode($categories);
         return $categories;
-      } catch (\PDOException $e) {
+        } catch (\PDOException $e) {
         // Log any errors that occur
         error_log("Error fetching categories: " . $e->getMessage());
         return [];
-    }
+      }
     }
 
     // Fetch categories filtered by __typename (e.g., 'Clothes' or 'Tech')
@@ -53,7 +53,28 @@ class CategoryRepository {
         // Log any errors that occur
         error_log("Error fetching categories: " . $e->getMessage());
         return [];
+      }
     }
-    }
+
+
+
+
+  //   public function getCategoryById($id) {
+  //     $stmt = $this->pdo->prepare('SELECT * FROM categories WHERE id = :id');
+  //     $stmt->execute(['id' => $id]);
+  //     return $stmt->fetch(PDO::FETCH_ASSOC);
+  // }
+
+  // public function getElectronicsAttributes($categoryId) {
+  //     $stmt = $this->pdo->prepare('SELECT * FROM electronics_attributes WHERE category_id = :category_id');
+  //     $stmt->execute(['category_id' => $categoryId]);
+  //     return $stmt->fetch(PDO::FETCH_ASSOC);
+  // }
+
+  // public function getClothingAttributes($categoryId) {
+  //     $stmt = $this->pdo->prepare('SELECT * FROM clothing_attributes WHERE category_id = :category_id');
+  //     $stmt->execute(['category_id' => $categoryId]);
+  //     return $stmt->fetch(PDO::FETCH_ASSOC);
+  // }
 }
 ?>
