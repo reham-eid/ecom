@@ -7,7 +7,6 @@ use PDO;
 use Exception;
 
 use Src\Repository\ProductRepository;
-// use Src\Repository\AttributeSetRepository;
 // use Src\Models\AttributeSet\TextAttribute;
 
 
@@ -220,7 +219,6 @@ class ProductResolver
 
     public static function GetProduct($productId) {
         $pdo = Database::getInstance();
-        // $attributes= new AttributeSetRepository($pdo);
         $repo = new ProductRepository($pdo );
         $products = $repo->findById($productId);
         return $products;

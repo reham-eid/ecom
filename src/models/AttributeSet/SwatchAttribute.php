@@ -8,15 +8,15 @@ use Src\Models\AttributeSet\AttributeSet;
 class SwatchAttribute extends AttributeSet {
     // protected $items;
 
-    public function __construct($pdo, $id, $name,$product_id, $type, $__typename ) {
-        $items = []; 
-        parent::__construct($pdo, $id, $name, $product_id , $items, $type, $__typename);
+    // public function __construct($pdo, $id, $name,$product_id, $type, $__typename ) {
+        // $items = []; 
+        // parent::__construct($pdo, $id, $name, $product_id , $type, $__typename);
         // if (!isset($this->items)) { 
         //     $this->fetchItems() ;
         // }
-        $this->pdo = $pdo;
+        // $this->pdo = $pdo;
         // $this->items = $this->fetchItems($repository);
-    }
+    // }
 
     // protected function fetchItems(AttributeRepository $repository) {
     //     $itemsData = $repository->getAttributesByProductId($this->id);
@@ -28,9 +28,9 @@ class SwatchAttribute extends AttributeSet {
     //     ], $itemsData);
     // }
 
-    public function getItems() {
-        return $this->items;
-    }
+    // public function getItems() {
+    //     return $this->items;
+    // }
 }
 
 

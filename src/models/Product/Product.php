@@ -14,7 +14,7 @@ abstract class Product {
     protected $description;
     protected $category;
     protected $brand;
-    protected $attributes = [];
+    protected array $attributes ;
     protected $gallery;
     protected array $prices; 
     protected $__typename;
@@ -41,7 +41,7 @@ abstract class Product {
         $this->prices = $prices; 
         $this->gallery = $gallery; 
         $this->brand = $brand;
-        $this->attributes = $attributes ?? [];
+        $this->attributes = $attributes ;
         $this->__typename = $__typename;
     }
 

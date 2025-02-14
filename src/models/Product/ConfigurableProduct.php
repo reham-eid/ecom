@@ -5,7 +5,7 @@ namespace Src\Models\Product;
 use Src\Models\Product\Product;
 
 class ConfigurableProduct extends Product {
-    protected $attributes = [];
+    // protected $attributes = [];
 
     public function getDetails() {
         return  [

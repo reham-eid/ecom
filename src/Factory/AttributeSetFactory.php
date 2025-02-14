@@ -4,21 +4,30 @@ namespace Src\Factory;
 
 use Src\Models\AttributeSet\TextAttribute;
 use Src\Models\AttributeSet\SwatchAttribute;
-use Src\Repository\AttributeSetRepository;
+use Src\Models\Attribute\Attribute;
+
 use PDO;
 
 class AttributeSetFactory {
     
     public static function create(PDO $pdo, array $attributeData) {
 
-        error_log("Creating Attribute for: " . $attributeData['id']);
-error_log(print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));
+        // error_log("Creating Attribute for: " . $attributeData['id']);
+        error_log(print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));
 
         // $attributeData = (array) $attributeData;  
 
-        $id = $attributeData['id'];
+        $id = $attributeData['attribute_id'];
         $name = $attributeData['name'];
         $type = $attributeData['type'];
+        $items =  new Attribute(
+            $pdo,
+            $attributeData['items_id'] , 
+            $attributeData['item_id'] , 
+            $attributeData['displayValue'] , 
+            $attributeData['value'] , 
+            $attributeData['__typename'] );
+        
         $product_id = $attributeData['product_id'];
         $__typename = $attributeData['__typename'] ?? 'AttributeSet';
 
@@ -26,9 +35,9 @@ error_log(print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true));
 
         switch ($type) {
             case 'text':
-                return new TextAttribute($pdo, $id, $name, $product_id , $type, $__typename );
+                return new TextAttribute($pdo, $id, $name, $product_id ,$items, $type, $__typename );
             case 'swatch':
-                return new SwatchAttribute($pdo, $id, $name, $product_id, $type, $__typename );
+                return new SwatchAttribute($pdo, $id, $name, $product_id,$items, $type, $__typename );
             default:
                 throw new \Exception("Unknown attribute type: " . $type);
         }

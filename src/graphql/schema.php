@@ -5,7 +5,7 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use Graphql\Types\ProductType;
 use Graphql\Types\CategoryType;
-use Graphql\Types\AttributeType;
+use Graphql\Types\AttributeSetType;
 // use graphql\types\OrderType;
 use Graphql\Resolvers\ProductResolver;
 use Graphql\Resolvers\CategoryResolver;
@@ -81,14 +81,17 @@ $queryType = new ObjectType([
                 return CategoryResolver::GetTech();
             }
         ],
-        'attributes' => [
-            'type' => Type::listOf(AttributeType::getInstance()), // Use Singleton
-            'resolve' => function () {
-                return AttributeResolver::fetchAttributes();
+        'attributeSet' => [
+            'type' => Type::listOf(AttributeSetType::getInstance()), // Use Singleton
+            'args' => [
+                'id' => ['type' => Type::id()],
+            ],
+            'resolve' => function ($root, $args) {
+                return AttributeResolver::fetchAttributesByProductId($args['id']);
             },
         ],
         'attribute' => [
-            'type' => AttributeType::getInstance(), // Use Singleton
+            'type' => AttributeSetType::getInstance(), // Use Singleton
             'args' => [
                 'id' => ['type' => Type::id()],
             ],

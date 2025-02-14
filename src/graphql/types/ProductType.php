@@ -56,8 +56,11 @@ class ProductType extends ObjectType
             'resolve' => function ($root, $args) {
               error_log("root from getAttributes productType: " . print_r($root, true));
     
-              return method_exists($root, 'getAttributes') ? $root->getAttributes() : [];
-          
+              // return method_exists($root, 'getAttributes') ? $root->getAttributes() : [];
+              if (method_exists($root, 'getAttributes')) {
+                error_log(print_r($root->getAttributes(), true));  
+                return $root->getAttributes();
+              }
               },
 
             ],

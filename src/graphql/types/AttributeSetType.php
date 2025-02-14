@@ -34,11 +34,12 @@ class AttributeSetType extends ObjectType
           ],
           'items' => [
             'type' => Type::listOf(AttributeType::getInstance()),
-            'resolve' => function ($root, $args) {
-                error_log(print_r($root['items'], true));
-                error_log(" root from items productType: " . print_r($root, true));
-                return method_exists($root, 'getItems') ? $root->getItems() : []; 
-            }
+            // 'resolve' => function ($root, $args) {
+            //   if (method_exists($root, 'getItems')) {
+            //     error_log(print_r($root->getItems(), true));  
+            //     return $root->getItems();
+            //   }
+            // }
           ],
           '__typename' => [
             'type' => Type::string(),

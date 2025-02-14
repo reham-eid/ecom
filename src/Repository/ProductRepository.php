@@ -7,8 +7,8 @@ use Src\Models\Price\Price;
 use Src\Models\Currency\Currency;
 use Src\Models\Gallery\Gallery;
 use Src\Factory\ProductFactory;
+use Src\Models\AttributeSet\AllAttributeSet;
 use Src\Models\Attribute\Attribute;
-use Src\Models\AttributeSet\TextAttribute;
 // use Src\Repository\AttributeSetRepository;
 
 class ProductRepository{
@@ -25,7 +25,7 @@ class ProductRepository{
         $stmt->execute(['id' => $id]);
         $productData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        print_r($productData);
+        // print_r($productData);
         if (!$productData) {
             http_response_code(404);
             return ["error" => "No products found!"]; // No product found
@@ -86,7 +86,7 @@ class ProductRepository{
 
         var_dump($id); 
         echo 'from product reppppppo    ';
-        echo json_encode($attributesData);
+        // echo json_encode($attributesData);
 
         $attributes = [];
         foreach ($attributesData as $attr) {
@@ -94,31 +94,38 @@ class ProductRepository{
             $attributeStmt->execute(['attribute_id' => $attr['attributes_id']]);
             $attributeData = $attributeStmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($attributeData) {
-                $attribute_items = new Attribute(
+            // echo json_encode($attributeData);
+            if (!$attributeData) {
+                error_log("⚠️ attributes not found " . $attr['attributes_id']);
+                $attributeData = null;
+            } else {
+                $attribute_items  = new Attribute(
                     $this->pdo, 
-                    $attr['id'], 
-                    $attr['attributes_id'], 
+                    $attributeData['id'], 
+                    $attributeData['attribute_id'], 
                     $attributeData['displayValue'] ?? 'N/A',  
                     $attributeData['value'] ?? 'N/A', 
                     $attributeData['__typename'] ?? 'Unknown'
                 );
-
-                $attributes[] = new TextAttribute(
-                    $this->pdo, 
-                    $attr['id'],
-                    $attr['name'],
-                    $attr['product_id'],
-                    $attribute_items,
-                    $attr['type'],
-                    $attr['__typename']
-                );
             }
+
+            $attributes[]  = new AllAttributeSet(
+                $this->pdo, 
+                $attr['id'], 
+                $attr['name'], 
+                $attr['product_id'],  
+                $attribute_items, 
+                $attr['type'], 
+                $attr['__typename'] 
+            );
             
-            echo 'from product reppppppo   attributes 🥲';
-            var_dump($attributes);
-            echo json_encode($attributes);
-        };
+
+        }
+        // echo json_decode($attributes);
+
+        // Debug outside the loop if needed
+        // echo 'from ProductFactory 🛠 attributes: ';
+        // var_dump($attributes);
 
         // Fetch prices
         $stmt = $this->pdo->prepare("SELECT * FROM prices WHERE product_id = :product_id");
